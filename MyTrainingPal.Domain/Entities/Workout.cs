@@ -20,10 +20,10 @@ namespace MyTrainingPal.Domain
         {
             // This situation should not occur a priori
             if (sets == null || sets.Any(set => set.Exercise == null))
-                return Result.Fail(new Tuple<ResultType, string>(ResultType.NullParameter, "Internal error. Sets where not added. Please contact support."));
+                return Result.Fail("Internal error. Sets where not added. Please contact support.");
 
             if (sets.Count == 0)
-                return Result.Fail(new Tuple<ResultType, string>(ResultType.EmptyList, "You have to provide workout sets."));
+                return Result.Fail("You have to provide workout sets.");
 
             Sets = sets;
             return Result.Ok();

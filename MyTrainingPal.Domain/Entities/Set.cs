@@ -21,10 +21,10 @@ namespace MyTrainingPal.Domain.Entities
         public Result AddTime(int seconds, int minutes = 0, int hours = 0)
         {
             if (hours < 0 || minutes < 0 || seconds < 0)
-                return Result.Fail(new Tuple<ResultType, string>(ResultType.IntegerValueNotValid, "The time values can not be negative"));
+                return Result.Fail("The time values can not be negative");
 
             if (hours == 0 && minutes == 0 && seconds == 0)
-                return Result.Fail(new Tuple<ResultType, string>(ResultType.IntegerValueNotValid, "An exercise needs to last at least 1 second."));
+                return Result.Fail("An exercise needs to last at least 1 second.");
 
             Seconds = seconds;
             Minutes = minutes;
@@ -43,7 +43,7 @@ namespace MyTrainingPal.Domain.Entities
         public Result AddTime(int reps)
         {
             if (reps <= 0)
-                return Result.Fail(new Tuple<ResultType, string>(ResultType.IntegerValueNotValid, "The number of repetitions can not be 0 or lower.")); 
+                return Result.Fail("The number of repetitions can not be 0 or lower."); 
 
             Repetitions = reps;
             return Result.Ok();

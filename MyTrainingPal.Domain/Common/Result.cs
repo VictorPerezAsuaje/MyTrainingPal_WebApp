@@ -1,46 +1,30 @@
 ﻿namespace MyTrainingPal.Domain.Common
 {
-    public enum ResultType
-    {
-        NullParameter,
-        EmptyString,
-        ObjectNotFound,
-        EmptyList,
-        LackRequiredElements,
-        IntegerValueNotValid,
-        GenericProcessError,
-        Ok
-    }
-
     public class Result
     {
         public bool IsSuccess { get; }
-        public Tuple<ResultType, string> Error { get; }
+        public string Error { get; }
         public bool IsFailure => !IsSuccess;
 
-        protected Result(bool isSuccess, Tuple<ResultType, string> error)
+        protected Result(bool isSuccess, string error)
         {
-            if (isSuccess && error.Item2 != string.Empty)
+            if (isSuccess && error != string.Empty)
                 throw new InvalidOperationException();
-            if (!isSuccess && error.Item2 == string.Empty)
-                throw new InvalidOperationException();
-            if (error.Item1 == ResultType.Ok && error.Item2 != string.Empty)
-                throw new InvalidOperationException();
-            if (error.Item1 != ResultType.Ok && error.Item2 == string.Empty)
+            if (!isSuccess && error == string.Empty)
                 throw new InvalidOperationException();
 
             IsSuccess = isSuccess;
             Error = error;
         }
 
-        public static Result Fail(Tuple<ResultType, string> error) => new Result(false, error);
-        public static Result<T> Fail<T>(Tuple<ResultType, string> error) => 
+        public static Result Fail(string error) => new Result(false, error);
+        public static Result<T> Fail<T>(string error) => 
             new Result<T>(default(T), false, error);
 
         public static Result Ok() 
-            => new Result(true, new Tuple<ResultType, string>(ResultType.Ok, string.Empty));
+            => new Result(true, string.Empty);
         public static Result<T> Ok<T>(T value) 
-            => new Result<T>(value, true, new Tuple<ResultType, string>(ResultType.Ok, string.Empty));
+            => new Result<T>(value, true, string.Empty);
     }
 
     public class Result<T> : Result
@@ -56,7 +40,7 @@
             }
         }
 
-        protected internal Result(T value, bool isSuccess, Tuple<ResultType, string> error) : base(isSuccess, error)
+        protected internal Result(T value, bool isSuccess, string error) : base(isSuccess, error)
         {
             _value = value;
         }
