@@ -2,8 +2,8 @@
 {
     public enum ForceType
     {
-        Push,
-        Pull,
-        FullBody
+        Push = 0,
+        Pull = 1,
+        FullBody = 2
     }
 }

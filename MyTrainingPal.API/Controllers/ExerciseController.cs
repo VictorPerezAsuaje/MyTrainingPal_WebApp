@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MyTrainingPal.Domain.Entities;
-using MyTrainingPal.Infrastructure.Interfaces;
+using MyTrainingPal.Infrastructure.Repositories;
 
 namespace MyTrainingPal.API.Controllers
 {
