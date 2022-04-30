@@ -1,32 +1,36 @@
 ﻿using MyTrainingPal.Domain.Common;
-using MyTrainingPal.Domain.Entities;
 using MyTrainingPal.Domain.Enums;
 
-namespace MyTrainingPal.Domain
+namespace MyTrainingPal.Domain.Entities
 {
     public class Workout : BaseEntity
     {
-        public IList<Set> Sets { get; private set; } = new List<Set>();
+        public string Name { get; private set; }
+        public List<Set> Sets { get; private set; } = new List<Set>();
         public WorkoutType WorkoutType { get; private set; }
-        public DateTime WorkoutDate { get; private set; }
 
-        public Workout(WorkoutType workoutType, DateTime completionDate)
+        Workout(){ }
+
+        public static Result<Workout> Generate(WorkoutType workoutType, string name,
+            /* OPTIONAL */
+            int? id = null)
         {
-            WorkoutType = workoutType;
-            WorkoutDate = completionDate;
+            Workout workout = new Workout();
+
+            // Generation
+            if(id != null)
+                workout.Id = (int)id;
+
+            workout.Name = name;
+            workout.WorkoutType = workoutType;
+
+            return Result.Ok(workout); 
         }
 
-        public Result AddWorkoutSets(List<Set> sets)
+        public Workout WithSets(List<Set> sets)
         {
-            // This situation should not occur a priori
-            if (sets == null || sets.Any(set => set.Exercise == null))
-                return Result.Fail("Internal error. Sets where not added. Please contact support.");
-
-            if (sets.Count == 0)
-                return Result.Fail("You have to provide workout sets.");
-
             Sets = sets;
-            return Result.Ok();
+            return this;
         }
     }
 }

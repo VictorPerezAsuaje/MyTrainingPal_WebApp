@@ -10,7 +10,6 @@ namespace MyTrainingPal.Domain.Entities
         public DifficultyLevel Level { get; }
         public ForceType ForceType { get; }
         public bool Equipment { get; }
-        public MediaGallery? Gallery { get; } 
 
         Exercise(string name, List<MuscleGroup> muscleGroups, DifficultyLevel level, ForceType forceType, bool hasEquipment, int? id = null) 
         {

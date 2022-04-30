@@ -1,10 +1,14 @@
-﻿using MyTrainingPal.Domain.Common;
-
-namespace MyTrainingPal.Domain.Entities
+﻿namespace MyTrainingPal.Domain.Entities
 {
     public class MuscleGroup
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
+        public int Id { get; private set; }
+        public string Name { get; private set; }
+
+        public MuscleGroup(int id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
     }
 }

@@ -1,11 +1,11 @@
-﻿namespace MyTrainingPal.Domain.Interfaces
+﻿using MyTrainingPal.Domain.Common;
+
+namespace MyTrainingPal.Domain.Interfaces
 {
-    public interface IRepository<T>
+    public interface IRepository<T> : IReadOnlyRepository<T>
     {
-        void Add(T entity);
-        void Delete(int id);
-        void Update(T entity);
-        T GetById(int id);
-        IEnumerable<T> GetAll(int page = 0, int pageSize = 5);
+        Result Add(T entity);
+        Result Delete(int id);
+        Result Update(T entity);
     }
 }
