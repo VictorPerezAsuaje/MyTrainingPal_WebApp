@@ -22,9 +22,9 @@ namespace MyTrainingPal.API.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<ExerciseGetDTO>> GetExercises(int? page = null, int? pageSize = null)
+        public ActionResult<List<ExerciseGetDTO>> GetExercises()
         {
-            Result<List<Exercise>> result = _exerciseRepo.GetAll(page, pageSize);
+            Result<List<Exercise>> result = _exerciseRepo.GetAll();
 
             if(result.IsFailure)
                 return BadRequest(result.Error);

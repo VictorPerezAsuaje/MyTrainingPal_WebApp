@@ -16,7 +16,7 @@ namespace MyTrainingPal.Domain.Common
 
         public static Result<Set> Generate(Exercise exercise, SetType setType, 
             /* OPTIONAL */
-            int? seconds = null, int? repetitions = null, int? minutes = null, int? hours = null)
+            int? id = null, int? seconds = null, int? repetitions = null, int? minutes = null, int? hours = null)
         {
             Set set = new Set();
 
@@ -46,7 +46,10 @@ namespace MyTrainingPal.Domain.Common
 
             // Generate
 
-            if(repetitions != null)
+            if (id != null)
+                set.Id = (int)id;
+
+            if (repetitions != null)
                 set.Repetitions = (int)repetitions;
 
             if(seconds != null)

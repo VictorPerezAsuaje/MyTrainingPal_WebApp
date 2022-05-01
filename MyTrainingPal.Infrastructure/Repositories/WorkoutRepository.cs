@@ -2,6 +2,7 @@
 using MyTrainingPal.Domain.Entities;
 using MyTrainingPal.Domain.Enums;
 using MyTrainingPal.Domain.Interfaces;
+using System.Data;
 using System.Data.SqlClient;
 
 namespace MyTrainingPal.Infrastructure.Repositories
@@ -13,17 +14,62 @@ namespace MyTrainingPal.Infrastructure.Repositories
     {
         private readonly string connectionString = "Server=(localdb)\\mssqllocaldb;Database=MyTrainingPalDb;Trusted_Connection=True;MultipleActiveResultSets=true";
 
-        public Result<List<Workout>> GetAll(int? page = null, int? pageSize = null)
+
+        private Result<Set> FillWorkoutEntity(SqlDataReader reader, Workout workout)
         {
-            if(page < 0)
-                return Result.Fail<List<Workout>>("The page can not be less than 0.");
+            // Exercise generation
 
-            if (pageSize < 1)
-                return Result.Fail<List<Workout>>("The page size can not be less than 1.");
+            Result<Exercise> exerciseResult = Exercise.Generate(
+                id: (int)reader["ExerciseId"],
+                name: (string)reader["ExerciseName"],
+                muscleGroups: new List<MuscleGroup>(),
+                level: (DifficultyLevel)reader["Level"],
+                forceType: (ForceType)reader["ForceType"],
+                hasEquipment: (bool)reader["RequiresEquipment"]);
 
-            if ((page == null && pageSize != null) || (page != null && pageSize == null))
-                return Result.Fail<List<Workout>>("If a page or a page size is requested, the other one must be indicated as well. Please make sure to request both the page and page size if you want pagination.");
+            if (exerciseResult.IsFailure)
+                return Result.Fail<Set>(exerciseResult.Error);
 
+            Exercise exercise = exerciseResult.Value;
+
+            // Set generation
+
+            int? seconds = null;
+            int? minutes = null;
+            int? hours = null;
+            int? reps = null;
+
+            if (reader["Time"] != DBNull.Value)
+            {
+                DateTime time = (DateTime)reader["Time"];
+                seconds = time.Second;
+                minutes = time.Minute;
+                hours = time.Hour;
+            }
+
+            if (reader["Repetitions"] != DBNull.Value)
+                reps = (int)reader["Repetitions"];
+
+
+            Result<Set> resultSet = Set.Generate
+            (
+                id: (int)reader["SetId"],
+                exercise: exercise,
+                setType: (SetType)reader["SetType"],
+                seconds: seconds,
+                minutes: minutes,
+                hours: hours,
+                repetitions: reps
+            );
+
+            if (resultSet.IsFailure)
+                return Result.Fail<Set>(resultSet.Error);
+
+            return resultSet;
+        }
+
+        public Result<List<Workout>> GetAll()
+        {
             List<Workout> workouts = new List<Workout>();
 
             try
@@ -33,80 +79,32 @@ namespace MyTrainingPal.Infrastructure.Repositories
                     con.Open();
                     SqlCommand cmd = new SqlCommand();
                     cmd.Connection = con;
-                    cmd.CommandText = "SELECT Workout.Id AS WorkoutId, Workout.Name AS WorkoutName, WorkoutType, SetType, Repetitions, Time, Exercises.Id AS ExerciseId, Exercises.Name AS ExerciseName, Level, ForceType, RequiresEquipment FROM Workout JOIN Sets ON Sets.WorkoutId = Workout.Id JOIN Exercises ON Sets.ExerciseId = Exercises.Id";
-
-                    cmd.Parameters.Clear();
-
-                    if (page != null && pageSize != null)
-                    {
-                        cmd.CommandText += " OFFSET(@Skip) ROWS FETCH NEXT(@Take) ROWS ONLY ";
-                        cmd.Parameters.AddWithValue("@Skip", page * pageSize);
-                        cmd.Parameters.AddWithValue("@Take", pageSize);
-                    }
+                    cmd.CommandText = "SELECT Workout.Id AS WorkoutId, Workout.Name AS WorkoutName, WorkoutType, SetType, Repetitions, Time, Exercises.Id AS ExerciseId, Exercises.Name AS ExerciseName, Level, ForceType, RequiresEquipment FROM Workout JOIN Sets ON Sets.WorkoutId = Workout.Id JOIN Exercises ON Sets.ExerciseId = Exercises.Id ORDER BY WorkoutId";
 
                     SqlDataReader reader = cmd.ExecuteReader();
-
+                    Result<Workout> workoutResult = null;
                     using (reader)
                     {
                         while (reader.Read())
                         {
                             // Workout generation
 
-                            Result<Workout> workoutResult = Workout.Generate
-                            (
-                                id: (int)reader["WorkoutId"],
-                                name: (string)reader["WorkoutName"],
-                                workoutType: (WorkoutType)reader["WorkoutType"]
-                            );
+                            if(workoutResult == null)
+                            {
+                                workoutResult = Workout.Generate
+                                (
+                                    id: (int)reader["WorkoutId"],
+                                    name: (string)reader["WorkoutName"],
+                                    workoutType: (WorkoutType)reader["WorkoutType"]
+                                );
 
-                            if (workoutResult.IsFailure)
-                                return Result.Fail<List<Workout>>(workoutResult.Error);
+                                if (workoutResult.IsFailure)
+                                    return Result.Fail<List<Workout>>(workoutResult.Error);
+                            }
 
                             Workout workout = workoutResult.Value;
 
-                            // Exercise generation
-
-                            Result<Exercise> exerciseResult = Exercise.Generate(
-                                id: (int)reader["ExerciseId"],
-                                name: (string)reader["ExerciseName"],
-                                muscleGroups: new List<MuscleGroup>(),
-                                level: (DifficultyLevel)reader["Level"],
-                                forceType: (ForceType)reader["ForceType"], 
-                                hasEquipment: (bool)reader["RequiresEquipment"]);
-
-                            if (exerciseResult.IsFailure)
-                                return Result.Fail<List<Workout>>(exerciseResult.Error);
-
-                            Exercise exercise = exerciseResult.Value;
-
-                            // Set generation
-
-                            int? seconds = null;
-                            int? minutes = null;
-                            int? hours = null;
-                            int? reps = null;
-
-                            if (reader["Time"] != DBNull.Value)
-                            {
-                                TimeOnly time = (TimeOnly)reader["Time"];
-                                seconds = time.Second;
-                                minutes = time.Minute;
-                                hours = time.Hour;
-                            }
-
-                            if (reader["Repetitions"] != DBNull.Value)
-                                reps = (int)reader["Repetitions"];
-                            
-
-                            Result<Set> resultSet = Set.Generate
-                            (
-                                exercise: exercise,
-                                setType: (SetType)reader["SetType"],
-                                seconds: seconds,
-                                minutes: minutes,
-                                hours: hours,
-                                repetitions: reps
-                            );
+                            Result<Set> resultSet = FillWorkoutEntity(reader, workout);
 
                             if (resultSet.IsFailure)
                                 return Result.Fail<List<Workout>>(resultSet.Error);
@@ -129,7 +127,7 @@ namespace MyTrainingPal.Infrastructure.Repositories
             }
             catch (Exception ex)
             {
-                Result.Fail<List<Workout>>("The list of workouts could not be retrieved.");
+                return Result.Fail<List<Workout>>("Some error has ocurred and the list of workouts could not be retrieved.");
             }
 
             return Result.Ok(workouts);
@@ -137,7 +135,58 @@ namespace MyTrainingPal.Infrastructure.Repositories
 
         public Result<Workout> GetById(int id)
         {
-            throw new NotImplementedException();
+            Workout workout = null;
+
+            try
+            {
+                using (SqlConnection con = new SqlConnection(connectionString))
+                {
+                    con.Open();
+                    SqlCommand cmd = new SqlCommand();
+                    cmd.Connection = con;
+                    cmd.CommandText = "SELECT Workout.Id AS WorkoutId, Workout.Name AS WorkoutName, WorkoutType, Sets.Id AS SetId, SetType, Repetitions, Time, Exercises.Id AS ExerciseId, Exercises.Name AS ExerciseName, Level, ForceType, RequiresEquipment FROM Workout JOIN Sets ON Sets.WorkoutId = Workout.Id JOIN Exercises ON Sets.ExerciseId = Exercises.Id WHERE WorkoutId = @WorkoutId";
+                    cmd.Parameters.AddWithValue("@WorkoutId", id);
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    Result<Workout> workoutResult = null;
+
+                    using (reader)
+                    {
+                        while (reader.Read())
+                        {
+                            // Workout generation
+
+                            if (workoutResult == null)
+                            {
+                                workoutResult = Workout.Generate
+                                (
+                                    id: (int)reader["WorkoutId"],
+                                    name: (string)reader["WorkoutName"],
+                                    workoutType: (WorkoutType)reader["WorkoutType"]
+                                );
+
+                                if (workoutResult.IsFailure)
+                                    return Result.Fail<Workout>(workoutResult.Error);
+                            }
+
+                            workout = workoutResult.Value;
+
+                            Result<Set> resultSet = FillWorkoutEntity(reader, workout);
+
+                            if (resultSet.IsFailure)
+                                return Result.Fail<Workout>(resultSet.Error);
+
+                            workout.Sets.Add(resultSet.Value);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return Result.Fail<Workout>("There was an error and the workout could not be retrieved.");
+            }
+
+            return Result.Ok(workout);
         }
 
         public Result Add(Workout entity)
@@ -180,8 +229,8 @@ namespace MyTrainingPal.Infrastructure.Repositories
                         else
                         {
                             cmdSets.CommandText += " Time) OUTPUT INSERTED.Id VALUES(@WorkoutId, @ExerciseId, @SetType, @Time)";
-                            TimeOnly timeOnly = new TimeOnly(hour: set.Hours, minute: set.Minutes, second: set.Seconds);
-                            cmdSets.Parameters.AddWithValue("@Time", timeOnly);
+                            DateTime time = Convert.ToDateTime($"{set.Hours}:{set.Minutes}:{set.Seconds}");
+                            cmdSets.Parameters.AddWithValue("@Time", time);
                         }
 
                         cmdSets.ExecuteNonQuery();
@@ -223,7 +272,71 @@ namespace MyTrainingPal.Infrastructure.Repositories
 
         public Result Update(Workout entity)
         {
-            throw new NotImplementedException();
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                con.Open();
+                SqlTransaction transaction = con.BeginTransaction();
+                SqlCommand cmdWorkout = new SqlCommand("UPDATE Workout SET Name = @Name, WorkoutType = @WorkoutType WHERE Id = @WorkoutId", con);
+                cmdWorkout.Transaction = transaction;
+                cmdWorkout.Parameters.AddWithValue("@WorkoutId", entity.Id);
+                cmdWorkout.Parameters.AddWithValue("@Name", entity.Name);
+                cmdWorkout.Parameters.AddWithValue("@WorkoutType", entity.WorkoutType);
+
+                try
+                {
+                    cmdWorkout.ExecuteNonQuery();
+
+                    /* UPDATING SETS */
+
+                    // Deleting previous sets
+
+                    SqlCommand cmdDeleteSets = new SqlCommand();
+                    cmdDeleteSets.Connection = con;
+                    cmdDeleteSets.Transaction = transaction;
+                    cmdDeleteSets.CommandText = "DELETE Sets WHERE WorkoutId = @WorkoutId";
+                    cmdDeleteSets.Parameters.AddWithValue("@WorkoutId", entity.Id);
+                    cmdDeleteSets.Transaction = transaction;
+                    cmdDeleteSets.ExecuteNonQuery();
+
+                    // Adding new sets
+
+                    SqlCommand cmdSets = new SqlCommand();
+                    cmdSets.Connection = con;
+                    cmdSets.Transaction = transaction;
+
+                    foreach (Set set in entity.Sets)
+                    {
+                        cmdSets.CommandText = "INSERT INTO Sets (WorkoutId, ExerciseId, SetType, ";
+                        cmdSets.Parameters.Clear();
+                        cmdSets.Parameters.AddWithValue("@WorkoutId", entity.Id);
+                        cmdSets.Parameters.AddWithValue("@ExerciseId", set.Exercise.Id);
+                        cmdSets.Parameters.AddWithValue("@SetType", set.SetType);
+
+                        if (set.SetType == SetType.ByRepetition)
+                        {
+                            cmdSets.CommandText += " Repetitions) OUTPUT INSERTED.Id VALUES(@WorkoutId, @ExerciseId, @SetType, @Repetitions)";
+                            cmdSets.Parameters.AddWithValue("@Repetitions", set.Repetitions);
+                        }
+                        else
+                        {
+                            cmdSets.CommandText += " Time) OUTPUT INSERTED.Id VALUES(@WorkoutId, @ExerciseId, @SetType, @Time)";
+                            DateTime time = Convert.ToDateTime($"{set.Hours}:{set.Minutes}:{set.Seconds}");
+                            cmdSets.Parameters.AddWithValue("@Time", time);
+                        }
+
+                        cmdSets.ExecuteNonQuery();
+                    }
+
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    return Result.Fail("Something happened whilst trying to update the workout.");
+                }
+            }
+
+            return Result.Ok();
         }
     }
 }

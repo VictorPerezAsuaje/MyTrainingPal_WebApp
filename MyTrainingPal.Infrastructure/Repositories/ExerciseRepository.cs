@@ -13,17 +13,8 @@ namespace MyTrainingPal.Infrastructure.Repositories
     {
         private readonly string connectionString = "Server=(localdb)\\mssqllocaldb;Database=MyTrainingPalDb;Trusted_Connection=True;MultipleActiveResultSets=true";
 
-        public Result<List<Exercise>> GetAll(int? page = null, int? pageSize = null)
+        public Result<List<Exercise>> GetAll()
         {
-            if(page < 0)
-                return Result.Fail<List<Exercise>>("The page can not be less than 0.");
-
-            if (pageSize < 1)
-                return Result.Fail<List<Exercise>>("The page size can not be less than 1.");
-
-            if ((page == null && pageSize != null) || (page != null && pageSize == null))
-                return Result.Fail<List<Exercise>>("If a page or a page size is requested, the other one must be indicated as well. Please make sure to request both the page and page size if you want pagination.");
-
             List<Exercise> exercises = new List<Exercise>();
 
             try
@@ -33,15 +24,6 @@ namespace MyTrainingPal.Infrastructure.Repositories
                 SqlCommand cmd = new SqlCommand();
                 cmd.Connection = con;
                 cmd.CommandText = "SELECT ExerciseId, Exercises.Name AS ExerciseName, Level, ForceType, RequiresEquipment, MuscleGroupId, MuscleGroups.Name AS MuscleGroupName FROM Exercises JOIN ExercisesMuscleGroups ON ExercisesMuscleGroups.ExerciseId = Exercises.Id JOIN MuscleGroups ON ExercisesMuscleGroups.MuscleGroupId = MuscleGroups.Id ORDER BY ExerciseId ";
-
-                cmd.Parameters.Clear();
-
-                if(page != null && pageSize != null)
-                {
-                    cmd.CommandText += " OFFSET(@Skip) ROWS FETCH NEXT(@Take) ROWS ONLY ";
-                    cmd.Parameters.AddWithValue("@Skip", page * pageSize);
-                    cmd.Parameters.AddWithValue("@Take", pageSize);
-                }
 
                 SqlDataReader reader = cmd.ExecuteReader();
 

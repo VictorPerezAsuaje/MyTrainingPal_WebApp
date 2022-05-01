@@ -5,7 +5,7 @@ using MyTrainingPal.Domain.Entities;
 
 namespace MyTrainingPal.API.Services
 {
-    public interface IExerciseMapper : IMapper<Exercise, ExerciseGetDTO, ExercisePostDTO>
+    public interface IExerciseMapper : IMapper<Exercise, ExerciseGetDTO, ExercisePostDTO, ExercisePutDTO>
     {    }
 
     public class ExerciseMapper : IExerciseMapper
@@ -33,5 +33,10 @@ namespace MyTrainingPal.API.Services
                 level: postDTO.Level,
                 muscleGroups: postDTO._muscleGroups
             );
+
+        public Result<Exercise> PutDTOToEntity(Exercise currentEntity, ExercisePutDTO putDTO)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
