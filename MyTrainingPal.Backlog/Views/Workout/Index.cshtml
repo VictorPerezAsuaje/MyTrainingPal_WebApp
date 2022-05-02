@@ -1,0 +1,81 @@
+﻿@using MyTrainingPal.Domain.Enums
+@using MyTrainingPal.Infrastructure.DTO.Workout
+@using MyTrainingPal.Service.DTO.Workouts
+
+@model List<WorkoutGetDTO>
+
+@{
+    ViewData["Title"] = "Welcome!";
+    WorkoutFilterDTO filter = (WorkoutFilterDTO)ViewData["WorkoutFilter"];
+}
+
+<div id="mySidebar" class="sidebar">
+    <form asp-controller="Workout" asp-action="FilterWorkouts" method="get" data-ajax="true"  data-ajax-method="get" data-ajax-update="#workoutList" data-ajax-mode="replace">
+        <div class="filters">
+            <div>
+                <h5 class="text-light">Set Types</h5>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="setType" id="setTypeNull" value="null" for="SetType" checked>
+                    <label class="form-check-label text-light" for="setTypeNull">
+                        None
+                    </label>
+                </div>
+                @foreach(int setType in Enum.GetValues(typeof(SetType)))
+                {
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="setType" id="setType@(setType)" value="@setType" for="SetType" >
+                        <label class="form-check-label text-light" for="setType@(setType)">
+                        @Enum.GetName(typeof(SetType), setType)
+                        </label>
+                    </div>
+                }
+            </div>
+            <div>
+                <h5 class="text-light">Workout Types</h5>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="workoutType" id="workoutTypeNull" value="null" for="WorkoutType" checked>
+                    <label class="form-check-label text-light" for="workoutTypeNull">
+                        None
+                    </label>
+                </div>
+                @foreach(int workoutType in Enum.GetValues(typeof(WorkoutType)))
+                {
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="workoutType" id="workoutType@(workoutType)" value="@workoutType" for="WorkoutType">
+                        <label class="form-check-label text-light" for="workoutType@(workoutType)">
+                        @Enum.GetName(typeof(WorkoutType), workoutType)
+                        </label>
+                    </div>
+                }
+            </div>
+            <div>
+                <h5 class="text-light">Level</h5>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="level" id="levelNull" value="null" for="Level" checked>
+                    <label class="form-check-label text-light" for="levelNull">
+                        None
+                    </label>
+                </div>
+                @foreach(int level in Enum.GetValues(typeof(DifficultyLevel)))
+                {
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="level" id="level@(level)" value="@level" for="Level">
+                        <label class="form-check-label text-light" for="level@(level)">
+                        @Enum.GetName(typeof(DifficultyLevel), level)
+                        </label>
+                    </div>
+                }
+            </div>
+        </div>
+        <button class="btn btn-primary" type="submit">FILTER WORKOUTS</button>
+    </form>
+</div>
+
+<button id="openFiltersBtn" class="openbtn" onclick="openNav()"><i class="bi bi-search"></i>
+</button>  
+
+<section class="wrapper">
+    <div class="workout-container" id="workoutList">
+        <partial name="_WorkoutListPartial" for="@Model" />
+    </div>
+</section>

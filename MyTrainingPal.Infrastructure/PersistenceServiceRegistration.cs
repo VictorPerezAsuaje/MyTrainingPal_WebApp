@@ -10,6 +10,7 @@ namespace MyTrainingPal.Infrastructure
         {
             services.AddScoped<IWorkoutRepository, WorkoutRepository>();
             services.AddScoped<IExerciseRepository, ExerciseRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
 
             return services;
         }

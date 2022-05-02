@@ -1,6 +1,5 @@
-using MyTrainingPal.API.Services;
 using MyTrainingPal.Infrastructure;
-using MyTrainingPal.Infrastructure.Repositories;
+using MyTrainingPal.Service.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +9,6 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IWorkoutMapper, WorkoutMapper>();
 builder.Services.AddScoped<IExerciseMapper, ExerciseMapper>();
-builder.Services.AddScoped<ISetRepository, SetRepository>();
 
 builder.Services.AddPersistenceServices(builder.Configuration);
 

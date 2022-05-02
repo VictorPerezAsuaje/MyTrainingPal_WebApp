@@ -1,0 +1,138 @@
+﻿@using MyTrainingPal.Domain.Entities
+@using MyTrainingPal.Service.DTO.User
+@model UserGetDTO
+
+@{
+    ViewData["Title"] = "Profile";
+}
+
+@if(Model == null)
+{
+    <p>There was an error loading the user profile. Please try again later.</p>
+}
+else
+{
+    <section class="wrapper">
+        <nav aria-label="breadcrumb mb-3" class="main-breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active" aria-current="page">Profile</li>
+            </ol>
+        </nav>
+
+        <div class="row gutters-sm px-0">
+            <div class="col-md-4 mb-3">
+                <div class="card p-4">
+                    <div class="card-body">
+                        <div class="d-flex flex-column align-items-center text-center">
+                            <img src="https://i1.rgstatic.net/ii/profile.image/953219836571648-1604276727180_Q512/Victor-Asuaje-2.jpg" alt="User profile" class="rounded-circle profile-pic">
+                            <div class="mt-3">
+                                <h4>Victor Pérez Asuaje</h4>
+                                <p class="text-secondary mb-1">Full Stack Developer</p>
+                                <p class="text-muted font-size-sm">Seville, Spain</p>
+                                <a class="btn btn-primary" href="https://www.linkedin.com/in/victor-perez-asuaje/" target="_blank">Follow</a>
+                                <a class="btn btn-outline-primary" href="https://academiadotnet.com/" target="_blank">Web</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card mb-3 p-3">
+                    <div class="card-body">
+                        <div class="row my-4">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Full Name</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                @Model.FullName
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row my-4">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Email</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                @Model.Email
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row my-4">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Is a Pal?</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                @if (@Model.IsPremium)
+                                {
+                                    <span>Nice! <i class="bi bi-patch-check"></i></span>
+                                }
+                                else
+                                {
+                                    <p>Why not? 😢</p>
+                                    <small>Want to be part of our family?</small>
+                                }
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row my-4">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Registered on</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                @Model.RegistrationDate
+                            </div>
+                        </div>
+                    </div>
+                     <div class="card-footer d-flex justify-content-end">
+                        <a class="btn btn-secondary disabled" href="#">Edit</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row gutters-sm px-0">
+                <div class="col-sm-6 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="d-flex align-items-center mb-3">Stats</h6>
+                            <!-- For loop all the Workout Types depending on previous history -->
+                            @foreach(var pair in Model.WorkoutTypeFrequency)
+                            {
+                                <small>@Enum.GetName(pair.Key)</small>
+                                <div class="progress mb-3" style="height: 5px">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: @pair.Value%" aria-valuenow="@pair.Value" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="d-flex align-items-center mb-3">Latest Workouts</h6>
+                            <!-- Horizontal styled workout list ordered by date -->
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                      <th scope="col">Date</th>
+                                      <th scope="col">Workout name</th>
+                                      <th scope="col">Workout type</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach(WorkoutHistory history in Model.CompletedWorkouts)
+                                    {
+                                        <tr>
+                                            <td>@history.CompletionDate</td>
+                                            <td>@history.Workout.Name</td>
+                                            <td>@history.Workout.WorkoutType</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </section>
+}

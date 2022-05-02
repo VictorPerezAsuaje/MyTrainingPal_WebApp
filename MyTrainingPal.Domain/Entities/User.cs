@@ -5,14 +5,19 @@ namespace MyTrainingPal.Domain.Entities
 {
     public class User : BaseEntity
     {
-        private string Name { get; set; }
-        private string LastName { get; set; }
+        private string Name;
+        private string LastName;
         public string FullName => $"{Name} {LastName}";
         public string Email { get; private set; }
         private string Password { get; set; }
         public bool IsPremium { get; private set; } = false;
-        private DateTime _RegistrationDate { get; set; }
+        public bool IsAdmin { get; private set; } = false;
+        private DateTime _RegistrationDate;
         public string RegistrationDate { get => _RegistrationDate.ToShortDateString(); }
+
+        public List<Workout> CreatedWorkouts { get; private set; } = new List<Workout>();
+
+        public List<WorkoutHistory> CompletedWorkouts { get; private set; } = new List<WorkoutHistory>();
 
         User() { }
 
@@ -21,12 +26,12 @@ namespace MyTrainingPal.Domain.Entities
             => Password == password;
 
         // Temporarily here, but I'm guessing this would fit better in a service that serves as a layer between the creation of an user and the encription of the pass.
-        private Result ValidatePassword(string password)
+        private static Result ValidatePassword(string password)
         {
             List<char> allowedChars = new List<char> { '@', '!', '¡', '#', '$', '*' };
 
-            if (password.Length < 8)
-                return Result.Fail("Password length can not be lower than 8 characters.");
+            if (password.Length < 8 || password.Length > 20)
+                return Result.Fail("Password length can not be lower than 8 characters nor more than 20 characters.");
 
             if (!password.Any(char.IsUpper))
                 return Result.Fail($"The password should contain at least one uppercase.");
@@ -43,7 +48,7 @@ namespace MyTrainingPal.Domain.Entities
             return Result.Ok();
         }
 
-        private Result ValidateEmail(string email)
+        private static Result ValidateEmail(string email)
         {
             string trimmedMail = email.Trim();
 
@@ -59,9 +64,9 @@ namespace MyTrainingPal.Domain.Entities
             return Result.Ok();
         }
 
-        public Result<User> Generate(string name, string lastName, string email, string password, DateTime registrationDate, bool isPremium,
+        public static Result<User> Generate(string name, string lastName, string email, string password, DateTime registrationDate, bool isPremium,
             /* OPCIONAL */
-            int? id = null)
+            int? id = null, bool? isAdmin = null)
         {
             User user = new User();
 
@@ -70,11 +75,20 @@ namespace MyTrainingPal.Domain.Entities
             if (string.IsNullOrEmpty(name))
                 return Result.Fail<User>("The name can not be empty.");
 
+            if (name.Length > 50)
+                return Result.Fail<User>("The name can not have more than 50 characters.");
+
             if (string.IsNullOrEmpty(lastName))
                 return Result.Fail<User>("The last name can not be empty.");
 
+            if (lastName.Length > 150)
+                return Result.Fail<User>("The last name can not have more than 150 characters.");
+
             if (string.IsNullOrEmpty(email))
                 return Result.Fail<User>("The email can not be empty.");
+
+            if (email.Length > 150)
+                return Result.Fail<User>("The email can not have more than 150 characters.");
 
             Result emailValidation = ValidateEmail(email);
             if (emailValidation.IsFailure)
@@ -91,6 +105,11 @@ namespace MyTrainingPal.Domain.Entities
             if(id != null)
                 user.Id = (int)id;
 
+            if (isAdmin == null)
+                user.IsAdmin = false;
+            else
+                user.IsAdmin = (bool)isAdmin;
+
             user.Name = name;
             user.LastName = lastName;
             user.Email = email;
@@ -99,6 +118,18 @@ namespace MyTrainingPal.Domain.Entities
             user._RegistrationDate = registrationDate;
 
             return Result.Ok(user);
+        }
+
+        public User WithCreatedWorkouts(List<Workout> workouts)
+        {
+            CreatedWorkouts = workouts;
+            return this;
+        }
+
+        public User WithCompletedWorkouts(List<WorkoutHistory> workouts)
+        {
+            CompletedWorkouts = workouts;
+            return this;
         }
     }
 }

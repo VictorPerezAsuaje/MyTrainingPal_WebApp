@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\MyTrainingPal.Domain\MyTrainingPal.Domain.csproj" />
     <ProjectReference Include="..\MyTrainingPal.Infrastructure\MyTrainingPal.Infrastructure.csproj" />
+    <ProjectReference Include="..\MyTrainingPal.Service\MyTrainingPal.Service.csproj" />
   </ItemGroup>
 
 </Project>

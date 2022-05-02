@@ -2,6 +2,7 @@
 using MyTrainingPal.Domain.Entities;
 using MyTrainingPal.Domain.Enums;
 using MyTrainingPal.Domain.Interfaces;
+using MyTrainingPal.Infrastructure.DTO.Workout;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -9,11 +10,11 @@ namespace MyTrainingPal.Infrastructure.Repositories
 {
     public interface IWorkoutRepository : IRepository<Workout>
     {
+        Result<List<Workout>> FindMatch(WorkoutFilterDTO? filter = null);
     }
     public class WorkoutRepository : IWorkoutRepository
     {
         private readonly string connectionString = "Server=(localdb)\\mssqllocaldb;Database=MyTrainingPalDb;Trusted_Connection=True;MultipleActiveResultSets=true";
-
 
         private Result<Set> FillWorkoutEntity(SqlDataReader reader, Workout workout)
         {
@@ -68,7 +69,45 @@ namespace MyTrainingPal.Infrastructure.Repositories
             return resultSet;
         }
 
-        public Result<List<Workout>> GetAll()
+
+        private string GenerateFilter(SqlCommand cmd, WorkoutFilterDTO filter)
+        {
+            string sqlFilter = "";
+
+            if (filter.Level != null)
+            {
+                sqlFilter += " AND Level = @Level";
+                cmd.Parameters.AddWithValue("@Level", filter.Level);
+            }
+
+            if (filter.SetType != null)
+            {
+                sqlFilter += " AND SetType = @SetType";
+                cmd.Parameters.AddWithValue("@SetType", filter.SetType);
+            }
+
+            if (filter.WorkoutType != null)
+            {
+                sqlFilter += " AND WorkoutType = @WorkoutType";
+                cmd.Parameters.AddWithValue("@WorkoutType", filter.WorkoutType);
+            }
+
+            if (filter.Level != null)
+            {
+                sqlFilter += " AND RequiresEquipment = @Equipment";
+                cmd.Parameters.AddWithValue("@Equipment", filter.Equipment);
+            }
+
+            if (filter.UserId != null)
+            {
+                sqlFilter += " AND UserId = @UserId";
+                cmd.Parameters.AddWithValue("@UserId", filter.UserId);
+            }
+
+            return sqlFilter;
+        }
+
+        public Result<List<Workout>> FindMatch(WorkoutFilterDTO? filter = null)
         {
             List<Workout> workouts = new List<Workout>();
 
@@ -79,7 +118,10 @@ namespace MyTrainingPal.Infrastructure.Repositories
                     con.Open();
                     SqlCommand cmd = new SqlCommand();
                     cmd.Connection = con;
-                    cmd.CommandText = "SELECT Workout.Id AS WorkoutId, Workout.Name AS WorkoutName, WorkoutType, SetType, Repetitions, Time, Exercises.Id AS ExerciseId, Exercises.Name AS ExerciseName, Level, ForceType, RequiresEquipment FROM Workout JOIN Sets ON Sets.WorkoutId = Workout.Id JOIN Exercises ON Sets.ExerciseId = Exercises.Id ORDER BY WorkoutId";
+                    cmd.CommandText = "SELECT Workout.Id AS WorkoutId, Workout.Name AS WorkoutName, WorkoutType, Sets.Id AS SetId, SetType, Repetitions, Time, Exercises.Id AS ExerciseId, Exercises.Name AS ExerciseName, Level, ForceType, RequiresEquipment FROM Workout JOIN Sets ON Sets.WorkoutId = Workout.Id JOIN Exercises ON Sets.ExerciseId = Exercises.Id WHERE 1=1 ";
+
+                    if(filter != null)
+                        cmd.CommandText += GenerateFilter(cmd, filter);
 
                     SqlDataReader reader = cmd.ExecuteReader();
                     Result<Workout> workoutResult = null;
@@ -89,18 +131,15 @@ namespace MyTrainingPal.Infrastructure.Repositories
                         {
                             // Workout generation
 
-                            if(workoutResult == null)
-                            {
-                                workoutResult = Workout.Generate
-                                (
-                                    id: (int)reader["WorkoutId"],
-                                    name: (string)reader["WorkoutName"],
-                                    workoutType: (WorkoutType)reader["WorkoutType"]
-                                );
+                            workoutResult = Workout.Generate
+                            (
+                                id: (int)reader["WorkoutId"],
+                                name: (string)reader["WorkoutName"],
+                                workoutType: (WorkoutType)reader["WorkoutType"]
+                            );
 
-                                if (workoutResult.IsFailure)
-                                    return Result.Fail<List<Workout>>(workoutResult.Error);
-                            }
+                            if (workoutResult.IsFailure)
+                                return Result.Fail<List<Workout>>(workoutResult.Error);
 
                             Workout workout = workoutResult.Value;
 
@@ -132,6 +171,70 @@ namespace MyTrainingPal.Infrastructure.Repositories
 
             return Result.Ok(workouts);
         }
+
+        public Result<List<Workout>> GetAll()
+        {
+            List<Workout> workouts = new List<Workout>();
+
+            try
+            {
+                using (SqlConnection con = new SqlConnection(connectionString))
+                {
+                    con.Open();
+                    SqlCommand cmd = new SqlCommand();
+                    cmd.Connection = con;
+                    cmd.CommandText = "SELECT Workout.Id AS WorkoutId, Workout.Name AS WorkoutName, WorkoutType, Sets.Id AS SetId, SetType, Repetitions, Time, Exercises.Id AS ExerciseId, Exercises.Name AS ExerciseName, Level, ForceType, RequiresEquipment FROM Workout JOIN Sets ON Sets.WorkoutId = Workout.Id JOIN Exercises ON Sets.ExerciseId = Exercises.Id";
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    Result<Workout> workoutResult = null;
+                    using (reader)
+                    {
+                        while (reader.Read())
+                        {
+                            // Workout generation
+                            
+                            workoutResult = Workout.Generate
+                            (
+                                id: (int)reader["WorkoutId"],
+                                name: (string)reader["WorkoutName"],
+                                workoutType: (WorkoutType)reader["WorkoutType"]
+                            );
+
+                            if (workoutResult.IsFailure)
+                                return Result.Fail<List<Workout>>(workoutResult.Error);
+                            
+
+                            Workout workout = workoutResult.Value;
+
+                            Result<Set> resultSet = FillWorkoutEntity(reader, workout);
+
+                            if (resultSet.IsFailure)
+                                return Result.Fail<List<Workout>>(resultSet.Error);
+
+                            Set set = resultSet.Value;
+
+                            if (workouts.Any(w => w.Id == workout.Id))
+                            {
+                                workouts.Where(e => e.Id == workout.Id)
+                                .FirstOrDefault()?.Sets.Add(set);
+                            }
+                            else
+                            {
+                                workout.Sets.Add(set);
+                                workouts.Add(workout);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return Result.Fail<List<Workout>>("Some error has ocurred and the list of workouts could not be retrieved.");
+            }
+
+            return Result.Ok(workouts);
+        }
+
 
         public Result<Workout> GetById(int id)
         {
@@ -338,5 +441,7 @@ namespace MyTrainingPal.Infrastructure.Repositories
 
             return Result.Ok();
         }
+
+        
     }
 }

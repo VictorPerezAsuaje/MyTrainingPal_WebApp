@@ -1,0 +1,238 @@
+@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
+
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.main-content {
+    min-height: 100vh;
+}
+
+/* MENU AND NAVBAR */
+
+.fix-bottom-sm {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    top: unset;
+    left: 0;
+    z-index: 1030;
+}
+
+.navbar-nav {
+    flex-direction: row;
+}
+
+@media(min-width: 576px) {
+    .fix-bottom-sm {
+        position: unset;
+        top: 0;
+        bottom: unset;
+    }
+}
+
+/* WORKOUT CONTAINER */
+
+.wrapper {
+    margin: 5vh 2vh;
+}
+
+.workout-container {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 2rem;
+}
+
+@media(min-width: 768px) {
+    .workout-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media(min-width: 992px) {
+    .workout-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* CARD */
+
+.workout-thumb {
+    z-index: 0;
+    object-fit: cover;
+    min-height: 450px;
+}
+
+.workout-data {
+    display: flex;
+    flex-direction: column;
+}
+
+.card {
+    border: none;
+    transition: all 500ms cubic-bezier(0.19, 1, 0.22, 1);
+    overflow: hidden;
+    border-radius: 20px;
+    min-height: 450px;
+    box-shadow: 0 0 12px 0 rgba(0,0,0,0.2);
+}
+
+    .card.card-has-bg {
+        transition: all 500ms cubic-bezier(0.19, 1, 0.22, 1);
+        background-size: 120%;
+        background-repeat: no-repeat;
+        background-position: center center;
+    }
+
+        .card.card-has-bg:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background: inherit;
+            filter: grayscale(100%);
+        }
+
+        .card.card-has-bg:hover {
+            transform: scale(0.98);
+            box-shadow: 0 0 5px -2px rgba(0,0,0,0.3);
+            background-size: 130%;
+            transition: all 500ms cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+            .card.card-has-bg:hover .card-img-overlay {
+                transition: all 800ms cubic-bezier(0.19, 1, 0.22, 1);
+                background: rgb(35,79,109);
+                background: linear-gradient(0deg, #455560 0%, rgba(4,69,114,0.5) 100%);
+            }
+
+.card-footer {
+    background: none;
+    border-top: none;
+}
+
+.card-meta {
+    color: #c1d82f;
+}
+
+.card-body {
+    transition: all 500ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.card-img-overlay {
+    transition: all 800ms cubic-bezier(0.19, 1, 0.22, 1);
+    background: rgb(35,79,109);
+    background: linear-gradient(0deg, #455560 0%, rgba(35,79,109,0.3785889355742297) 100%);
+}
+
+/* SIDEBAR FILTER */
+
+.sidebar {
+    min-height: 100vh;
+    width: 0;
+    position: fixed;
+    z-index: 0;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding: 8vh 0;
+    z-index: 1;
+}
+
+    .sidebar.open {
+        padding: 8vh 2vw;
+        width: 250px;
+    }
+
+.sidebar .filters > *{
+    margin: 6vh 0;
+}
+
+    .sidebar .filters a, .sidebar a {
+        padding: 8px 8px 8px 32px;
+        text-decoration: none;
+        font-size: 25px;
+        color: #818181;
+        display: block;
+        transition: 0.3s;
+    }
+
+        .sidebar .filters a:hover {
+            color: #f1f1f1;
+        }
+
+    .sidebar .closebtn {
+        position: absolute;
+        top: 10vh;
+        right: 25px;
+        font-size: 36px;
+        margin-left: 50px;
+    }
+
+.openbtn {
+    position: absolute;
+    top: 10vh;
+    left: -0.5vw;
+    font-size: 20px;
+    cursor: pointer;
+    background: linear-gradient(90deg, #111, #222);
+    color: white;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-right: 15px;
+    padding-left: clamp(25px, 2vw, 3vw);
+    border: none;
+    z-index: 1;
+}
+
+    .openbtn:hover {
+        background: linear-gradient(90deg, #111, #444);
+        padding-left: 3vw;
+    }
+
+#openFiltersBtn {
+    transition: all .5s;
+}
+
+    #openFiltersBtn.open {
+        transition: all .5s;
+        transform: translateX(250px);
+        padding-left: 3vw;
+    }
+
+@media screen and (max-height: 450px) {
+    .sidebar .filters {
+        padding-top: 15px;
+    }
+
+        .sidebar .filters a {
+            font-size: 18px;
+        }
+}
+
+/* PROFILE */
+
+.profile-pic{
+    object-fit: cover;
+    height: 175px;
+    width: 175px;
+}

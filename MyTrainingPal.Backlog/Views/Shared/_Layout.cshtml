@@ -1,0 +1,62 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - MyTrainingPal</title>
+    <link rel="stylesheet" href="~/lib/bootstrap-5.1.3/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/MyTrainingPal.Backlog.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar fix-bottom-sm navbar-expand-sm navbar-light bg-light px-5">
+            <a class="navbar-brand d-none d-sm-block" asp-area="" asp-controller="Home" asp-action="Index">
+                <img id="logo" src="/MyTrainingPal_logotipo.png" width="40" height="40" />
+            </a>
+            <div id="navbarCollapse" class="w-100">
+                <ul class="navbar-nav mr-auto justify-content-around justify-content-sm-end">
+                    <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
+                    <li class="nav-item active">
+                        <i class="bi bi-house-fill d-sm-none d-md-none d-lg-none"></i>
+                        <span class="d-none d-sm-block">Workouts</span>
+                        </li>
+                    </a>
+                    <!-- If not logged in -->
+                    @*<a class="nav-link" asp-area="" asp-controller="Identity" asp-action="Index">
+                        <li class="nav-item">
+                            <i class="bi bi-person-circle d-sm-none d-md-none d-lg-none"></i>
+                            <span class="d-none d-sm-block">Profile</span>
+                        </li>
+                    </a>*@
+                    <!-- If logged in -->
+                    <a class="nav-link" asp-area="" asp-controller="Profile" asp-action="Index">
+                        <li class="nav-item">
+                            <i class="bi bi-person-circle d-sm-none d-md-none d-lg-none"></i>
+                            <span class="d-none d-sm-block">Profile</span>
+                        </li>
+                    </a>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="main-content content px-2">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="mastfoot mt-auto">
+        <div class="inner">
+            <p>MyTrainingPal website made by <a href="#">Victor Pérez Asuaje</a>.</p>
+        </div>
+    </footer>
+
+    <script src="~/lib/bootstrap-5.1.3/js/bootstrap.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ajax-unobtrusive/3.2.6/jquery.unobtrusive-ajax.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
