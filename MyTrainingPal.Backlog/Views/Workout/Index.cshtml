@@ -9,7 +9,10 @@
     WorkoutFilterDTO filter = (WorkoutFilterDTO)ViewData["WorkoutFilter"];
 }
 
-<div id="mySidebar" class="sidebar">
+<button id="openFiltersBtn" class="openbtn bg-dark" onclick="openNav()"><i class="bi bi-search"></i>
+</button> 
+
+<div id="mySidebar" class="sidebar bg-dark">
     <form asp-controller="Workout" asp-action="FilterWorkouts" method="get" data-ajax="true"  data-ajax-method="get" data-ajax-update="#workoutList" data-ajax-mode="replace">
         <div class="filters">
             <div>
@@ -67,12 +70,9 @@
                 }
             </div>
         </div>
-        <button class="btn btn-primary" type="submit">FILTER WORKOUTS</button>
+        <button class="btn btn-primary" type="submit">FILTER</button>
     </form>
 </div>
-
-<button id="openFiltersBtn" class="openbtn" onclick="openNav()"><i class="bi bi-search"></i>
-</button>  
 
 <section class="wrapper">
     <div class="workout-container" id="workoutList">

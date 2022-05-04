@@ -1,5 +1,4 @@
-﻿using MyTrainingPal.Service.DTO.Exercise;
-using MyTrainingPal.Service.DTO.Workouts;
+﻿using MyTrainingPal.Service.DTO.Workouts;
 using MyTrainingPal.Service.Interfaces;
 using MyTrainingPal.Domain.Common;
 using MyTrainingPal.Domain.Entities;
@@ -26,6 +25,7 @@ namespace MyTrainingPal.Service.Services
         public WorkoutGetDTO EntityToGetDTO(Workout entity)
             => new WorkoutGetDTO
             {
+                Id = entity.Id,
                 Name = entity.Name,
                 Sets = entity.Sets,
                 WorkoutType = entity.WorkoutType

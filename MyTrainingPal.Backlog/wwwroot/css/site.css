@@ -25,6 +25,21 @@ body {
 
 /* MENU AND NAVBAR */
 
+#logo {
+    filter: grayscale(100%) invert(100%) contrast(1.25);
+}
+
+.menu-icon {
+    font-size: 1.25rem;
+    border-radius: 50%;
+    padding: 10px 13px;
+}
+
+    .menu-icon.selected {
+        background-color: rgba(255,255,255,0.05);
+    }
+
+
 .fix-bottom-sm {
     position: fixed;
     right: 0;
@@ -44,6 +59,12 @@ body {
         top: 0;
         bottom: unset;
     }
+}
+
+/* LOGIN */
+
+#loginImg {
+    z-index:-1;
 }
 
 /* WORKOUT CONTAINER */
@@ -70,9 +91,32 @@ body {
     }
 }
 
-/* CARD */
+/* WORKOUT DETAILS */
 
-.workout-thumb {
+.exercise-fullsize {
+    object-fit: cover;
+    width:100%;
+    max-height: 70vh;
+}
+
+.exercise-row {
+    background-position: right;
+}
+
+.completed {
+    background: linear-gradient(to left, white 50%, rgba(105,240,174,0.8) 50%) left;
+    background-size: 200%;
+    transition: 1s cubic-bezier(.65,.02,.82,.84);
+}
+
+/* CARD */
+.exercise-thumb {
+    object-fit: cover;
+    height: 150px;
+    width: 150px;
+}
+
+.workout-background {
     z-index: 0;
     object-fit: cover;
     min-height: 450px;
@@ -151,7 +195,6 @@ body {
     z-index: 0;
     top: 0;
     left: 0;
-    background-color: #111;
     overflow-x: hidden;
     transition: 0.5s;
     padding: 8vh 0;
@@ -194,7 +237,6 @@ body {
     left: -0.5vw;
     font-size: 20px;
     cursor: pointer;
-    background: linear-gradient(90deg, #111, #222);
     color: white;
     padding-top: 10px;
     padding-bottom: 10px;
@@ -202,11 +244,13 @@ body {
     padding-left: clamp(25px, 2vw, 3vw);
     border: none;
     z-index: 1;
+    opacity: 0.8;
+    transition: all .5s;
 }
 
     .openbtn:hover {
-        background: linear-gradient(90deg, #111, #444);
         padding-left: 3vw;
+        opacity: 1;
     }
 
 #openFiltersBtn {
@@ -217,6 +261,7 @@ body {
         transition: all .5s;
         transform: translateX(250px);
         padding-left: 3vw;
+        opacity: 1;
     }
 
 @media screen and (max-height: 450px) {

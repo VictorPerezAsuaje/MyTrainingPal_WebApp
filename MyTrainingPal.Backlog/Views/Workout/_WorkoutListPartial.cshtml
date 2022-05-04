@@ -15,7 +15,7 @@ else
     {
         <div class="card text-white card-has-bg click-col">
             <!-- Workout thumbnail -->
-            <img class="card-img workout-thumb" src="https://cdn.pixabay.com/photo/2017/04/22/10/15/woman-2250970_960_720.jpg" alt="">
+            <img class="card-img workout-background" src="https://cdn.pixabay.com/photo/2017/04/22/10/15/woman-2250970_960_720.jpg" alt="">
             <div class="card-img-overlay d-flex flex-column">
                 <div class="card-body">
                             
@@ -23,7 +23,7 @@ else
                 <div class="card-footer">
                     <small class="card-meta mb-2">@workout.WorkoutType</small>
                     <h4 class="card-title mt-0 ">
-                    <a class="text-white" herf="#">@workout.Name</a></h4>
+                    <a class="text-white" asp-action="WorkoutDetails" asp-route-workoutId="@workout.Id">@workout.Name</a></h4>
                     <div class="media">
                         <div class="media-body workout-data">
                             <small># Exercises: @workout.Sets.Count</small>

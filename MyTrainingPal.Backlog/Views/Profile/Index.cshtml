@@ -13,12 +13,6 @@
 else
 {
     <section class="wrapper">
-        <nav aria-label="breadcrumb mb-3" class="main-breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item active" aria-current="page">Profile</li>
-            </ol>
-        </nav>
-
         <div class="row gutters-sm px-0">
             <div class="col-md-4 mb-3">
                 <div class="card p-4">
@@ -59,16 +53,16 @@ else
                         <hr>
                         <div class="row my-4">
                             <div class="col-sm-3">
-                                <h6 class="mb-0">Is a Pal?</h6>
+                                <h6 class="mb-0">Are you one of our Premium Pals?</h6>
                             </div>
                             <div class="col-sm-9 text-secondary">
                                 @if (@Model.IsPremium)
                                 {
-                                    <span>Nice! <i class="bi bi-patch-check"></i></span>
+                                    <span>You are! <i class="bi bi-patch-check"></i></span>
                                 }
                                 else
                                 {
-                                    <p>Why not? 😢</p>
+                                    <p>You are not... 😢</p>
                                     <small>Want to be part of our family?</small>
                                 }
                             </div>
@@ -89,9 +83,9 @@ else
                 </div>
             </div>
         </div>
-        <div class="row gutters-sm px-0">
+        <div class="row gutters-sm">
                 <div class="col-sm-6 mb-3">
-                    <div class="card h-100">
+                    <div class="card p-3">
                         <div class="card-body">
                             <h6 class="d-flex align-items-center mb-3">Stats</h6>
                             <!-- For loop all the Workout Types depending on previous history -->
@@ -106,7 +100,7 @@ else
                     </div>
                 </div>
                 <div class="col-sm-6 mb-3">
-                    <div class="card h-100">
+                    <div class="card p-3">
                         <div class="card-body">
                             <h6 class="d-flex align-items-center mb-3">Latest Workouts</h6>
                             <!-- Horizontal styled workout list ordered by date -->
@@ -119,17 +113,32 @@ else
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach(WorkoutHistory history in Model.CompletedWorkouts)
+                                    @for(int i = 0; i < 5; i++)
+                                    {
+                                    @if(i < Model.CompletedWorkouts.Count)
                                     {
                                         <tr>
-                                            <td>@history.CompletionDate</td>
-                                            <td>@history.Workout.Name</td>
-                                            <td>@history.Workout.WorkoutType</td>
+                                            <td>@Model.CompletedWorkouts[i].CompletionDate</td>
+                                            <td>@Model.CompletedWorkouts[i].Workout.Name</td>
+                                            <td>@Model.CompletedWorkouts[i].Workout.WorkoutType</td>
                                         </tr>
+                                    }
+                                    
                                     }
                                 </tbody>
                             </table>
-                        
+                            <nav aria-label="Page navigation example">
+                              <ul class="pagination justify-content-end">
+                                @for(int i = 5; i <= Model.CompletedWorkouts.Count; i+=5)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" href="#">
+                                            @(i/5)
+                                        </a>
+                                    </li>
+                                }
+                              </ul>
+                            </nav>
                         </div>
                     </div>
                 </div>

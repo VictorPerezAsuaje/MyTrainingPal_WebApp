@@ -1,0 +1,38 @@
+﻿@using MyTrainingPal.Domain.Entities
+@using MyTrainingPal.Domain.Enums
+@using MyTrainingPal.Service.DTO.Workouts
+@model WorkoutGetDTO
+
+<a class="my-5 openbtn rounded text-decoration-none bg-dark" asp-action="Index">←</a>
+
+<div class="exercise-viewer mb-2 mt-2">
+    <img src="https://cdn.pixabay.com/photo/2017/04/22/10/15/woman-2250970_960_720.jpg" class="exercise-fullsize rounded"/>
+</div>
+
+<div class="mb-5 w-100 position-relative">
+    <button class="btn btn-primary btn-lg position-absolute top-0 start-50 translate-middle px-5 py-3 fw-bold" asp-action="Index">START WORKOUT</button>
+</div>
+
+<div id="workout-exercises">
+    @foreach(Set set in Model.Sets)
+{
+    <div id="@set.Id" class="exercise-row d-flex w-100 mb-2 border rounded text-black" onclick="MarkCompleted(this)">
+        
+        <img class="exercise-thumb rounded" src="https://cdn.pixabay.com/photo/2017/04/22/10/15/woman-2250970_960_720.jpg" />
+
+        <div class="w-100 d-flex justify-content-center align-items-center h2">
+            @if(set.SetType == SetType.ByRepetition)
+            {
+                <span>@set.Repetitions x @set.Exercise.Name</span>
+            }
+            else
+            {
+                <span><span class="exercise-time">@($"{new TimeOnly(set.Minutes, set.Seconds)}")</span> @set.Exercise.Name</span>
+            }
+            
+        </div>
+    </div>
+}
+</div>
+
+

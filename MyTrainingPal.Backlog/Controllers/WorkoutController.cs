@@ -27,7 +27,7 @@ namespace MyTrainingPal.Backlog.Controllers
 
             if (result.IsFailure)
             {
-                ViewData["Error"] = result.Error;
+                TempData["Error"] = result.Error;
                 return View();
             }
 
@@ -45,7 +45,7 @@ namespace MyTrainingPal.Backlog.Controllers
 
             if (result.IsFailure)
             {
-                ViewData["Error"] = result.Error;
+                TempData["Error"] = result.Error;
                 return PartialView("_WorkoutListPartial", new List<WorkoutGetDTO>());
             }
 
@@ -55,6 +55,22 @@ namespace MyTrainingPal.Backlog.Controllers
             List<WorkoutGetDTO> workoutDTO = _workoutMapper.EntityListToGetDTOList(result.Value);
 
             return PartialView("_WorkoutListPartial", workoutDTO);
+        }
+
+
+        public IActionResult WorkoutDetails(int workoutId)
+        {
+            Result<Workout> result = _workoutRepo.GetById(workoutId);
+
+            if (result.IsFailure)
+            {
+                TempData["Error"] = result.Error;
+                return RedirectToAction("Index");
+            }
+
+            WorkoutGetDTO workoutDTO = _workoutMapper.EntityToGetDTO(result.Value);
+
+            return View(workoutDTO);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
