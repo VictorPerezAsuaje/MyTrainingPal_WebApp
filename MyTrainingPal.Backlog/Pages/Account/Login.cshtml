@@ -1,0 +1,73 @@
+﻿@page
+@model MyTrainingPal.Backlog.Pages.Account.LoginModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Log in";
+    string returnUrl = Convert.ToString(Request.Query["returnurl"]);
+    string loginError = Convert.ToString(TempData["LoginError"]);
+}
+
+<div class="vh-100">
+    <section class="h-100 d-flex align-items-center">
+      <div class="container-fluid h-custom">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+          <div class="mb-3 col-md-9 col-lg-6 col-xl-5" style="z-index: -1;">
+            <img id="loginImg" class="img-fluid" src="~/fitness_tracker.svg" />
+          </div>
+          <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+            <form method="post" asp-route-returnUrl="@returnUrl">
+              <div class="d-flex flex-row align-items-center justify-content-center justify-content-lg-start" >
+                <p class="fw-normal mb-4 me-3 h2">Log in</p>
+              </div>
+              @if (!string.IsNullOrEmpty(loginError))
+                {
+                    <div class="alert alert-danger alert-dismissible fade show mb-2" role="alert">
+                      @loginError
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+
+              <div class="form-outline my-3 text-danger" asp-validation-summary="ModelOnly"></div>
+
+              <div class="form-outline mb-4">
+                <label class="form-label" asp-for="LoginForm.Email">Email address</label>
+                <input type="email" asp-for="LoginForm.Email" class="form-control form-control-lg"
+                  placeholder="Enter a valid email address" />
+                  <span class="text-danger" asp-validation-for="LoginForm.Email"></span>
+              </div>
+
+              <div class="form-outline mb-3">
+                <label class="form-label" asp-for="LoginForm.Password">Password</label>
+                <input asp-for="LoginForm.Password" type="password" class="form-control form-control-lg" placeholder="Enter password" />
+                <span class="text-danger" asp-validation-for="LoginForm.Password"></span>
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="form-check mb-0">
+                  <input asp-for="LoginForm.ImHuman" class="form-check-input me-2" type="checkbox" value="" onclick="this.checked ? this.value = 'true' : this.value = 'false'" />
+                  <label class="form-check-label" asp-for="LoginForm.ImHuman" >
+                    I'm a human (maybe 🤔)
+                  </label>
+                  <span class="text-danger" asp-validation-for="LoginForm.ImHuman"></span>
+                </div>
+                <a href="#" class="text-body">Forgot password?</a>
+              </div>
+
+              <div class="text-center text-lg-start mt-4 pt-2 d-flex flex-column">
+                <button type="submit" class="btn btn-primary btn-lg px-5">Login</button>
+                <p class="small fw-bold mt-2 pt-1 mb-0">Don't have an account? <a asp-page="/Account/Register"
+                    class="link-danger">Register</a></p>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+</div>
+
+@section scripts{
+   <partial name="_ValidationScriptsPartial" />
+}

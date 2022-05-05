@@ -8,6 +8,8 @@ namespace MyTrainingPal.Infrastructure.Repositories
 {
     public interface IUserRepository : IRepository<User>
     {
+        Result<User> FindUserByCredentials(string email, string password);
+        Result<User?> FindUserByEmail(string email);
     }
     public class UserRepository : IUserRepository
     {
@@ -56,42 +58,50 @@ namespace MyTrainingPal.Infrastructure.Repositories
                     con.Open();
                     SqlCommand cmd = new SqlCommand();
                     cmd.Connection = con;
-                    cmd.CommandText = "SELECT Users.Id AS UserId, Users.Name AS UserName, LastName, Email, Password, IsPremium, RegistrationDate, IsAdmin, Workout.Id AS WorkoutId, Workout.Name AS WorkoutName, WorkoutType FROM Users JOIN Workout ON Workout.UserId = Users.Id WHERE UserId = @UserId";
+                    cmd.CommandText = "SELECT Id, Name AS UserName, LastName, Email, Password, IsPremium, RegistrationDate, IsAdmin FROM Users WHERE Id = @UserId";
                     cmd.Parameters.AddWithValue("@UserId", id);
 
                     SqlDataReader reader = cmd.ExecuteReader();
 
-                    List<Workout> workouts = new List<Workout>();
-
                     while (reader.Read())
                     {
-                        if (user == null)
-                        {
-                            Result<User> userResult = User.Generate
-                            (
-                                id: (int)reader["UserId"],
-                                name: (string)reader["UserName"],
-                                lastName: (string)reader["LastName"],
-                                password: (string)reader["Password"],
-                                email: (string)reader["Email"],
-                                isAdmin: (bool)reader["IsAdmin"],
-                                isPremium: (bool)reader["IsPremium"],
-                                registrationDate: (DateTime)reader["RegistrationDate"]
-                            );
+                        Result<User> userResult = User.Generate
+                        (
+                            id: (int)reader["Id"],
+                            name: (string)reader["UserName"],
+                            lastName: (string)reader["LastName"],
+                            password: (string)reader["Password"],
+                            email: (string)reader["Email"],
+                            isAdmin: (bool)reader["IsAdmin"],
+                            isPremium: (bool)reader["IsPremium"],
+                            registrationDate: (DateTime)reader["RegistrationDate"]
+                        );
 
-                            if (userResult.IsFailure)
-                                return Result.Fail<User>(userResult.Error);
+                        if (userResult.IsFailure)
+                            return Result.Fail<User>(userResult.Error);
 
-                            user = userResult.Value;
-                        }
+                        user = userResult.Value;
+                    }
 
-                        // Workout generation
+                    if (user == null)
+                        return Result.Fail<User>("The user could not be retrieved");
 
+                    SqlCommand cmdWorkouts = new SqlCommand();
+                    cmdWorkouts.Connection = con;
+                    cmdWorkouts.CommandText = "SELECT Id AS WorkoutId, Name AS WorkoutName, WorkoutType FROM Workout WHERE UserId = @UserId";
+                    cmdWorkouts.Parameters.AddWithValue("@UserId", id);
+
+                    SqlDataReader readerWorkouts = cmdWorkouts.ExecuteReader();
+
+                    List<Workout> workouts = new List<Workout>();
+
+                    while (readerWorkouts.Read())
+                    {
                         Result<Workout> workoutResult = Workout.Generate
                         (
-                            id: (int)reader["WorkoutId"],
-                            name: (string)reader["WorkoutName"],
-                            workoutType: (WorkoutType)reader["WorkoutType"]
+                            id: (int)readerWorkouts["WorkoutId"],
+                            name: (string)readerWorkouts["WorkoutName"],
+                            workoutType: (WorkoutType)readerWorkouts["WorkoutType"]
                         );
 
                         if (workoutResult.IsFailure)
@@ -149,6 +159,103 @@ namespace MyTrainingPal.Infrastructure.Repositories
         public Result Update(User entity)
         {
             throw new NotImplementedException();
+        }
+
+        public Result<User> FindUserByCredentials(string email, string password)
+        {
+            User user = null;
+
+            try
+            {
+                using (SqlConnection con = new SqlConnection(connectionString))
+                {
+                    con.Open();
+                    SqlCommand cmd = new SqlCommand();
+                    cmd.Connection = con;
+                    cmd.CommandText = "SELECT Id AS UserId, Name AS UserName, LastName, Email, Password, IsPremium, RegistrationDate, IsAdmin FROM Users WHERE Email = @UserEmail AND Password = @UserPassword";
+                    cmd.Parameters.AddWithValue("@UserEmail", email);
+                    cmd.Parameters.AddWithValue("@UserPassword", password);
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        if (user == null)
+                        {
+                            Result<User> userResult = User.Generate
+                            (
+                                id: (int)reader["UserId"],
+                                name: (string)reader["UserName"],
+                                lastName: (string)reader["LastName"],
+                                password: (string)reader["Password"],
+                                email: (string)reader["Email"],
+                                isAdmin: (bool)reader["IsAdmin"],
+                                isPremium: (bool)reader["IsPremium"],
+                                registrationDate: (DateTime)reader["RegistrationDate"]
+                            );
+
+                            if (userResult.IsFailure)
+                                return Result.Fail<User>("There was an error retrieving user data.");
+
+                            user = userResult.Value;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return Result.Fail<User>("There was an error retrieving user data.");
+            }
+
+            return user != null ? Result.Ok(user) : Result.Fail<User>("Incorrect credentials.");
+        }
+
+        public Result<User?> FindUserByEmail(string email)
+        {
+            User user = null;
+
+            try
+            {
+                using (SqlConnection con = new SqlConnection(connectionString))
+                {
+                    con.Open();
+                    SqlCommand cmd = new SqlCommand();
+                    cmd.Connection = con;
+                    cmd.CommandText = "SELECT Id AS UserId, Name AS UserName, LastName, Email, Password, IsPremium, RegistrationDate, IsAdmin FROM Users WHERE Email = @UserEmail";
+                    cmd.Parameters.AddWithValue("@UserEmail", email);
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        if (user == null)
+                        {
+                            Result<User> userResult = User.Generate
+                            (
+                                id: (int)reader["UserId"],
+                                name: (string)reader["UserName"],
+                                lastName: (string)reader["LastName"],
+                                password: (string)reader["Password"],
+                                email: (string)reader["Email"],
+                                isAdmin: (bool)reader["IsAdmin"],
+                                isPremium: (bool)reader["IsPremium"],
+                                registrationDate: (DateTime)reader["RegistrationDate"]
+                            );
+
+                            if (userResult.IsFailure)
+                                return Result.Fail<User>("There was an error retrieving user data.");
+
+                            user = userResult.Value;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return Result.Fail<User>("There was an error retrieving user data.");
+            }
+
+            return Result.Ok(user);
         }
     }
 }

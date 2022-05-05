@@ -15,7 +15,7 @@ else
     <section class="wrapper">
         <div class="row gutters-sm px-0">
             <div class="col-md-4 mb-3">
-                <div class="card p-4">
+                <div class="card p-4 shadow-none">
                     <div class="card-body">
                         <div class="d-flex flex-column align-items-center text-center">
                             <img src="https://i1.rgstatic.net/ii/profile.image/953219836571648-1604276727180_Q512/Victor-Asuaje-2.jpg" alt="User profile" class="rounded-circle profile-pic">
@@ -31,7 +31,7 @@ else
                 </div>
             </div>
             <div class="col-md-8">
-                <div class="card mb-3 p-3">
+                <div class="card mb-3 p-3 shadow-none">
                     <div class="card-body">
                         <div class="row my-4">
                             <div class="col-sm-3">
@@ -83,9 +83,9 @@ else
                 </div>
             </div>
         </div>
-        <div class="row gutters-sm">
-                <div class="col-sm-6 mb-3">
-                    <div class="card p-3">
+        <div class="row gutters-sm flex-row-reverse ">
+            <div class="col-sm-4 mb-3">
+                <div class="card p-3 mb-3 shadow-none">
                         <div class="card-body">
                             <h6 class="d-flex align-items-center mb-3">Stats</h6>
                             <!-- For loop all the Workout Types depending on previous history -->
@@ -97,51 +97,41 @@ else
                                 </div>
                             }
                         </div>
-                    </div>
                 </div>
-                <div class="col-sm-6 mb-3">
-                    <div class="card p-3">
-                        <div class="card-body">
-                            <h6 class="d-flex align-items-center mb-3">Latest Workouts</h6>
-                            <!-- Horizontal styled workout list ordered by date -->
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                      <th scope="col">Date</th>
-                                      <th scope="col">Workout name</th>
-                                      <th scope="col">Workout type</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @for(int i = 0; i < 5; i++)
-                                    {
-                                    @if(i < Model.CompletedWorkouts.Count)
-                                    {
-                                        <tr>
-                                            <td>@Model.CompletedWorkouts[i].CompletionDate</td>
-                                            <td>@Model.CompletedWorkouts[i].Workout.Name</td>
-                                            <td>@Model.CompletedWorkouts[i].Workout.WorkoutType</td>
-                                        </tr>
-                                    }
-                                    
-                                    }
-                                </tbody>
-                            </table>
-                            <nav aria-label="Page navigation example">
-                              <ul class="pagination justify-content-end">
-                                @for(int i = 5; i <= Model.CompletedWorkouts.Count; i+=5)
-                                {
-                                    <li class="page-item">
-                                        <a class="page-link" href="#">
-                                            @(i/5)
-                                        </a>
-                                    </li>
-                                }
-                              </ul>
-                            </nav>
-                        </div>
+                <div class="card p-3 mb-3 shadow-none">
+                    <div class="card-body">
+                        <h6 class="d-flex align-items-center mb-3">Who knows...</h6>
+                        <!-- Work In Progress -->
                     </div>
                 </div>
             </div>
+
+            <div class="col-sm-8 mb-3">
+                <div class="card p-3 shadow-none">
+                    <div class="card-body">
+                        <h6 class="d-flex align-items-center mb-3">Latest Workouts</h6>
+                        @for(int i = 0; i < 2; i++)
+                        {
+                            @if(i < Model.CompletedWorkouts.Count)
+                            {
+                                <partial name="_WorkoutHistoryCardPartial" model="@Model.CompletedWorkouts[i]" />
+                            }
+                        }
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination justify-content-end">
+                            @for(int i = 5; i <= Model.CompletedWorkouts.Count; i+=5)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" href="#">
+                                        @(i/5)
+                                    </a>
+                                </li>
+                            }
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 }

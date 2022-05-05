@@ -23,25 +23,31 @@
                         <span class="d-none d-sm-block">Workouts</span>
                         </li>
                     </a>
-                    <!-- If not logged in -->
-                    @*<a class="nav-link" asp-area="" asp-controller="Identity" asp-action="Index">
-                        <li class="nav-item">
-                            <i class="bi bi-person-circle d-sm-none d-md-none d-lg-none"></i>
-                            <span class="d-none d-sm-block">Profile</span>
-                        </li>
-                    </a>*@
-                    <!-- If logged in -->
-                    <a class="nav-link text-white" asp-area="" asp-controller="Profile" asp-action="Index">
-                        <li class="nav-item">
-                            <i class="menu-icon bi bi-person-circle d-sm-none d-md-none d-lg-none @(ViewContext.RouteData?.Values["Controller"]?.ToString() == "Profile" ? "selected" : "")"></i>
-                            <span class="d-none d-sm-block">Profile</span>
-                        </li>
-                    </a>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <a class="nav-link text-white" asp-area="" asp-controller="Profile" asp-action="Index">
+                            <li class="nav-item">
+                                <i class="menu-icon bi bi-person-circle d-sm-none d-md-none d-lg-none @(ViewContext.RouteData?.Values["Controller"]?.ToString() == "Profile" ? "selected" : "")"></i>
+                                <span class="d-none d-sm-block">Profile</span>
+                            </li>
+                        </a>
+                    }
+                    else
+                    {
+                        <a class="nav-link" asp-page="/Account/Login">
+                            <li class="nav-item text-white">
+                                <i class="bi bi-person-circle d-sm-none d-md-none d-lg-none"></i>
+                                <span class="d-none d-sm-block">Log in</span>
+                            </li>
+                        </a>
+                    }
                 </ul>
             </div>
         </nav>
     </header>
-    <div class="container">
+    <div>
+        <partial name="_NotificationToastPartial" />
+        
         <main role="main" class="main-content content px-2">
             @RenderBody()
         </main>

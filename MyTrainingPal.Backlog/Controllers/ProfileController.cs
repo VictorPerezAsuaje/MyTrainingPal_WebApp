@@ -1,12 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MyTrainingPal.Domain.Common;
 using MyTrainingPal.Domain.Entities;
 using MyTrainingPal.Infrastructure.Repositories;
 using MyTrainingPal.Service.DTO.User;
 using MyTrainingPal.Service.Services;
+using System.Security.Claims;
 
 namespace MyTrainingPal.Backlog.Controllers
 {
+    [Authorize]
     public class ProfileController : Controller
     {
         private IUserRepository _userRepository;
@@ -19,11 +22,19 @@ namespace MyTrainingPal.Backlog.Controllers
 
         public IActionResult Index()
         {
-            Result<User> resultUser = _userRepository.GetById(1);
+            string userId = Convert.ToString(User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                TempData["Error"] = "There was an error finding the user logged. Please try to log in once again.";
+                return Redirect("/");
+            }
+
+            Result<User> resultUser = _userRepository.GetById(Convert.ToInt32(userId));
 
             if (resultUser.IsFailure)
             {
-                ViewData["ErrorMessage"] = resultUser.Error;
+                TempData["Error"] = resultUser.Error;
                 return View();
             }
 
