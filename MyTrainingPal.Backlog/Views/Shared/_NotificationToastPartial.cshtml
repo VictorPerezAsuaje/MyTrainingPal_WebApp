@@ -1,21 +1,21 @@
 ﻿@{
-    string msg = Convert.ToString(TempData["Error"]);
+    string errorMsg = Convert.ToString(TempData["Error"]);
+    string successMsg = Convert.ToString(TempData["Success"]);
 }
 
-@if (!string.IsNullOrEmpty(msg))
-{
-    <div aria-live="polite" aria-atomic="true" class="position-relative">
-        <div class="toast-container position-absolute top-0 end-0 p-3">
-        <div class="toast fade show" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="toast-header">
-            <i class="bi bi-exclamation-circle-fill ml-3"></i>
-            <strong class="mx-3 me-auto">System says: </strong>
-            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-            <div class="toast-body">
-            @msg
-            </div>
-        </div>
-        </div>
+@if(errorMsg == "" && successMsg == "") return;
+
+<div class="row justify-content-end">
+    <div class="alert @(errorMsg == "" ? "alert-success" : "alert-danger") alert-dismissible fade show mx-5 my-3 col-3" role="alert">
+    @if (!string.IsNullOrEmpty(errorMsg))
+    {
+        @errorMsg
+    }
+    else if (!string.IsNullOrEmpty(successMsg))
+    {
+        @successMsg  
+    }
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="z-index:1;"></button>
+
     </div>
-}
+</div>

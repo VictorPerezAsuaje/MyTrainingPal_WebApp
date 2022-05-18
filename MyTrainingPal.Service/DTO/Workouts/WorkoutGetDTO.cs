@@ -7,6 +7,7 @@ namespace MyTrainingPal.Service.DTO.Workouts
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public int NumberOfSets { get; set; }
         public List<Set> Sets { get; set; } = new List<Set>();
         public WorkoutType WorkoutType { get; set; }
     }

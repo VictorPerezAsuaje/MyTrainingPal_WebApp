@@ -1,0 +1,38 @@
+﻿@using MyTrainingPal.Service.DTO.User
+@model UserEditForm
+
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Edit User Data</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="userEditForm" asp-controller="Profile" asp-action="AcceptEditUser" asp-antiforgery="true">
+        <div class="modal-body" id="userEditContent">
+            <div class="form-outline mb-4">
+                <label class="form-label" asp-for="@Model.FormFirstName">First Name</label>
+                <input type="text" asp-for="@Model.FormFirstName" class="form-control form-control-lg" placeholder="Your first name." />
+                <span class="text-danger" asp-validation-for="@Model.FormFirstName"></span>
+            </div>
+
+            <div class="form-outline mb-4">
+                <label class="form-label" asp-for="@Model.FormLastName">Last Name</label>
+                <input type="text" asp-for="@Model.FormLastName" class="form-control form-control-lg" placeholder="Your last name." />
+                <span class="text-danger" asp-validation-for="@Model.FormLastName"></span>
+            </div>
+
+            <div class="form-outline mb-4">
+                <label class="form-label" asp-for="@Model.FormEmail">Email address</label>
+                <input type="email" asp-for="@Model.FormEmail" class="form-control form-control-lg"
+                    placeholder="Enter a valid email address" />
+                <span class="text-danger" asp-validation-for="@Model.FormEmail"></span>
+            </div>
+        
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary" for="userEditForm" data-bs-dismiss="modal">Save</button>
+        </div>
+        </form>
+    </div>
+</div>

@@ -27,6 +27,7 @@ namespace MyTrainingPal.Service.Services
             {
                 Id = entity.Id,
                 Name = entity.Name,
+                NumberOfSets = entity.NumberOfSets,
                 Sets = entity.Sets,
                 WorkoutType = entity.WorkoutType
             };
@@ -36,7 +37,8 @@ namespace MyTrainingPal.Service.Services
             Result<Workout> resultMap = Workout.Generate
             (
                 name: postDTO.Name,
-                workoutType: postDTO.WorkoutType
+                workoutType: postDTO.WorkoutType,
+                numberOfSets: postDTO.NumberOfSets
             );
 
             if (resultMap.IsFailure)
@@ -76,7 +78,7 @@ namespace MyTrainingPal.Service.Services
             }
 
             Workout workout = resultMap.Value;
-            workout.WithSets(sets);
+            workout.WithSets(sets, workout.NumberOfSets);
 
             return Result.Ok(workout);
         }
@@ -86,6 +88,7 @@ namespace MyTrainingPal.Service.Services
             WorkoutType workoutType = currentEntity.WorkoutType;
             string name = currentEntity.Name;
             List<Set> sets = currentEntity.Sets;
+            int numberSets = currentEntity.NumberOfSets;
 
             if(workoutType != putDTO.WorkoutType && putDTO.WorkoutType != default(WorkoutType))
                 workoutType = putDTO.WorkoutType;
@@ -93,11 +96,15 @@ namespace MyTrainingPal.Service.Services
             if(name != putDTO.Name && !string.IsNullOrEmpty(putDTO.Name))
                 name = putDTO.Name;
 
+            if (numberSets != putDTO.NumberOfSets)
+                numberSets = putDTO.NumberOfSets;
+
             Result<Workout> workoutResult = Workout.Generate
             (
                 id: currentEntity.Id,
                 workoutType: workoutType,
-                name: name
+                name: name,
+                numberOfSets: numberSets
             );
 
             if(workoutResult.IsFailure)
@@ -139,9 +146,9 @@ namespace MyTrainingPal.Service.Services
             Workout updatedWorkout = null;
 
             if (updatedSets.Count == 0)
-                updatedWorkout = workoutResult.Value.WithSets(sets);
+                updatedWorkout = workoutResult.Value.WithSets(sets, currentEntity.NumberOfSets != putDTO.NumberOfSets ? putDTO.NumberOfSets : currentEntity.NumberOfSets);
             else
-                updatedWorkout = workoutResult.Value.WithSets(updatedSets);
+                updatedWorkout = workoutResult.Value.WithSets(updatedSets, currentEntity.NumberOfSets != putDTO.NumberOfSets ? putDTO.NumberOfSets : currentEntity.NumberOfSets);
 
             return Result.Ok(updatedWorkout);
         }

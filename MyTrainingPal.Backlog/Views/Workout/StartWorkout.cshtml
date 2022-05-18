@@ -1,0 +1,16 @@
+﻿@using MyTrainingPal.Domain.Entities
+@using MyTrainingPal.Domain.Enums
+@using MyTrainingPal.Service.DTO.Workouts
+@model WorkoutGetDTO
+
+<a class="my-5 openbtn rounded text-decoration-none bg-dark" asp-action="Index">←</a>
+
+<div class="exercise-viewer mb-2 mt-2">
+    <img src="https://cdn.pixabay.com/photo/2017/04/22/10/15/woman-2250970_960_720.jpg" class="exercise-fullsize rounded"/>
+</div>
+
+<div id="workout-exercises">
+    <partial name="_OnGoingExercisePartial" model="@Model" />
+</div>
+
+

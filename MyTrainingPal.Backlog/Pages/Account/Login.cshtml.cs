@@ -71,6 +71,7 @@ namespace MyTrainingPal.Backlog.Pages.Account
                 return Page();
             }
 
+            TempData["Success"] = $"Welcome back, {user.Name}!";
 
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                 return Redirect(returnUrl);

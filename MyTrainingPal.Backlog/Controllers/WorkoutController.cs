@@ -7,6 +7,7 @@ using MyTrainingPal.Infrastructure.Repositories;
 using MyTrainingPal.Service.DTO.Workouts;
 using MyTrainingPal.Service.Services;
 using System.Diagnostics;
+using System.Security.Claims;
 
 namespace MyTrainingPal.Backlog.Controllers
 {
@@ -14,11 +15,13 @@ namespace MyTrainingPal.Backlog.Controllers
     {
         private readonly IWorkoutRepository _workoutRepo;
         private readonly IWorkoutMapper _workoutMapper;
+        private IUserRepository _userRepository;
 
-        public WorkoutController(IWorkoutRepository workoutRepo, IWorkoutMapper workoutMapper)
+        public WorkoutController(IWorkoutRepository workoutRepo, IWorkoutMapper workoutMapper, IUserRepository userRepository)
         {
             _workoutRepo = workoutRepo;
             _workoutMapper = workoutMapper;
+            _userRepository = userRepository;
         }
 
         public IActionResult Index()
@@ -57,8 +60,24 @@ namespace MyTrainingPal.Backlog.Controllers
             return PartialView("_WorkoutListPartial", workoutDTO);
         }
 
-
         public IActionResult WorkoutDetails(int workoutId)
+        {
+            ViewData["CurrentExercise"] = null;
+            Result<Workout> result = _workoutRepo.GetById(workoutId);
+
+            if (result.IsFailure)
+            {
+                TempData["Error"] = result.Error;
+                return RedirectToAction("Index");
+            }
+
+            WorkoutGetDTO workoutDTO = _workoutMapper.EntityToGetDTO(result.Value);
+
+            return View(workoutDTO);
+        }
+
+        [Route("{Controller}/{Action}/{workoutId:int}")]
+        public IActionResult StartWorkout(int workoutId)
         {
             Result<Workout> result = _workoutRepo.GetById(workoutId);
 
@@ -71,6 +90,30 @@ namespace MyTrainingPal.Backlog.Controllers
             WorkoutGetDTO workoutDTO = _workoutMapper.EntityToGetDTO(result.Value);
 
             return View(workoutDTO);
+        }
+
+        [Route("{Controller}/{Action}/{workoutId:int}")]
+        public IActionResult SaveWorkoutAttempt(int workoutId)
+        {
+            Result result = null;
+            try
+            {
+                result = _userRepository.AddWorkoutToHistory(workoutId, Convert.ToInt32(User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value));
+            }
+            catch(Exception ex)
+            {
+                TempData["Error"] = "There was an error trying to save the workout";
+                return RedirectToAction("Index");
+            }
+            
+            if(result.IsFailure)
+            {
+                TempData["Error"] = result.Error;
+                return RedirectToAction("Index");
+            }
+
+            TempData["Success"] = "Congratulations! Your attempt has been saved in your account 😁";
+            return RedirectToAction("Index");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

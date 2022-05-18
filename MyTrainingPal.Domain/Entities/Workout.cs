@@ -6,14 +6,15 @@ namespace MyTrainingPal.Domain.Entities
     public class Workout : BaseEntity
     {
         public string Name { get; private set; }
+        public int NumberOfSets { get; private set; }
         public List<Set> Sets { get; private set; } = new List<Set>();
         public WorkoutType WorkoutType { get; private set; }
         public bool UserMade { get => User != null; }
-        public User? User { get; set; }
+        public User? User { get; private set; }
 
         Workout(){ }
 
-        public static Result<Workout> Generate(WorkoutType workoutType, string name,
+        public static Result<Workout> Generate(WorkoutType workoutType, string name, int numberOfSets,
             /* OPTIONAL */
             int? id = null, User? user = null)
         {
@@ -28,13 +29,15 @@ namespace MyTrainingPal.Domain.Entities
 
             workout.Name = name;
             workout.WorkoutType = workoutType;
+            workout.NumberOfSets = numberOfSets;
 
             return Result.Ok(workout); 
         }
 
-        public Workout WithSets(List<Set> sets)
+        public Workout WithSets(List<Set> sets, int numberOfSets)
         {
             Sets = sets;
+            NumberOfSets = numberOfSets;
             return this;
         }
     }

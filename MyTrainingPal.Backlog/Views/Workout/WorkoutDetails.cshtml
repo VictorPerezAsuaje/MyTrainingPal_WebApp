@@ -3,6 +3,10 @@
 @using MyTrainingPal.Service.DTO.Workouts
 @model WorkoutGetDTO
 
+@{
+    ViewData["CurrentWorkout"] = null;
+}
+
 <a class="my-5 openbtn rounded text-decoration-none bg-dark" asp-action="Index">←</a>
 
 <div class="exercise-viewer mb-2 mt-2">
@@ -10,13 +14,13 @@
 </div>
 
 <div class="mb-5 w-100 position-relative">
-    <button class="btn btn-primary btn-lg position-absolute top-0 start-50 translate-middle px-5 py-3 fw-bold" asp-action="Index">START WORKOUT</button>
+    <a class="btn btn-primary btn-lg position-absolute top-0 start-50 translate-middle px-5 py-3 fw-bold" asp-action="StartWorkout" asp-route-workoutId="@Model.Id" >START WORKOUT</a>
 </div>
 
 <div id="workout-exercises">
     @foreach(Set set in Model.Sets)
 {
-    <div id="@set.Id" class="exercise-row d-flex w-100 mb-2 border rounded text-black" onclick="MarkCompleted(this)">
+    <div id="@set.Id" class="exercise-row d-flex w-100 mb-2 border rounded text-black" >
         
         <img class="exercise-thumb rounded" src="https://cdn.pixabay.com/photo/2017/04/22/10/15/woman-2250970_960_720.jpg" />
 

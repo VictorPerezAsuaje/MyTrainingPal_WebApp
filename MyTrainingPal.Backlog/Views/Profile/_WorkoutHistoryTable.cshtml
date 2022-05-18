@@ -1,0 +1,29 @@
+﻿@using MyTrainingPal.Domain.Entities
+@model List<WorkoutHistory>
+
+@{
+    int page = (int)ViewData["Page"];
+    int pageLength = (int)ViewData["PageLength"];
+    List<WorkoutHistory> filteredData = (List<WorkoutHistory>?)TempData["HistoryList"] ?? Model;
+}
+
+<nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-end">
+    @for(int i = 0; i < Model.Count; i+=pageLength)
+    {
+        <li class="page-item @(i/pageLength == page? "active" : "")">
+            <form asp-controller="Profile" asp-action="ChangeHistoryWorkoutPage" asp-route-page="@(i/pageLength)" method="get" data-ajax="true" data-ajax-method="get" data-ajax-update="#workoutHistoryPanel" data-ajax-mode="replace">
+                <button type="submit" class="page-link">@(i/pageLength+1)</button>
+            </form>
+        </li>
+    }
+    </ul>
+</nav>
+
+@for(int i = 0; i < pageLength; i++)
+{
+    @if(i < filteredData.Count)
+    {
+        <partial name="_WorkoutHistoryCardPartial" model="@filteredData[i]" />
+    }
+}

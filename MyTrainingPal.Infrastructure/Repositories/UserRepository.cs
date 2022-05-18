@@ -10,6 +10,7 @@ namespace MyTrainingPal.Infrastructure.Repositories
     {
         Result<User> FindUserByCredentials(string email, string password);
         Result<User?> FindUserByEmail(string email);
+        Result AddWorkoutToHistory(int workoutId, int userId);
     }
     public class UserRepository : IUserRepository
     {
@@ -88,7 +89,7 @@ namespace MyTrainingPal.Infrastructure.Repositories
 
                     SqlCommand cmdWorkouts = new SqlCommand();
                     cmdWorkouts.Connection = con;
-                    cmdWorkouts.CommandText = "SELECT Id AS WorkoutId, Name AS WorkoutName, WorkoutType FROM Workout WHERE UserId = @UserId";
+                    cmdWorkouts.CommandText = "SELECT Id AS WorkoutId, Name AS WorkoutName, WorkoutType, NumberOfSets FROM Workout WHERE UserId = @UserId";
                     cmdWorkouts.Parameters.AddWithValue("@UserId", id);
 
                     SqlDataReader readerWorkouts = cmdWorkouts.ExecuteReader();
@@ -101,7 +102,8 @@ namespace MyTrainingPal.Infrastructure.Repositories
                         (
                             id: (int)readerWorkouts["WorkoutId"],
                             name: (string)readerWorkouts["WorkoutName"],
-                            workoutType: (WorkoutType)readerWorkouts["WorkoutType"]
+                            workoutType: (WorkoutType)readerWorkouts["WorkoutType"],
+                            numberOfSets: (int)readerWorkouts["NumberOfSets"]
                         );
 
                         if (workoutResult.IsFailure)
@@ -114,7 +116,7 @@ namespace MyTrainingPal.Infrastructure.Repositories
 
                     SqlCommand cmdHistory = new SqlCommand();
                     cmdHistory.Connection = con;
-                    cmdHistory.CommandText = "SELECT Workout.UserId AS UserId, Workout.Id AS WorkoutId, Workout.Name AS WorkoutName, WorkoutType, CompletionDate FROM UserWorkoutHistory JOIN Workout ON Workout.Id = UserWorkoutHistory.WorkoutId WHERE Workout.UserId = @UserId";
+                    cmdHistory.CommandText = "SELECT Workout.UserId AS UserId, Workout.Id AS WorkoutId, Workout.Name AS WorkoutName, WorkoutType, CompletionDate, NumberOfSets FROM UserWorkoutHistory JOIN Workout ON Workout.Id = UserWorkoutHistory.WorkoutId WHERE Workout.UserId = @UserId";
                     cmdHistory.Parameters.AddWithValue("@UserId", id);
 
                     SqlDataReader historyReader = cmdHistory.ExecuteReader();
@@ -126,7 +128,8 @@ namespace MyTrainingPal.Infrastructure.Repositories
                         (
                             id: (int)historyReader["WorkoutId"],
                             name: (string)historyReader["WorkoutName"],
-                            workoutType: (WorkoutType)historyReader["WorkoutType"]
+                            workoutType: (WorkoutType)historyReader["WorkoutType"],
+                            numberOfSets: (int)historyReader["NumberOfSets"]
                         );
 
                         if (workoutResult.IsFailure)
@@ -148,7 +151,32 @@ namespace MyTrainingPal.Infrastructure.Repositories
 
         public Result Add(User entity)
         {
-            throw new NotImplementedException();
+            Result result = Result.Fail("User registration has failed.");
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                con.Open();
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = con;
+                cmd.CommandText = "INSERT INTO Users(Name, LastName, Email, Password, IsPremium, RegistrationDate, IsAdmin) VALUES (@Name, @LastName, @Email, @Password, @IsPremium, @RegistrationDate, @IsAdmin)";
+                cmd.Parameters.AddWithValue("@Name", entity.Name);
+                cmd.Parameters.AddWithValue("@LastName", entity.LastName);
+                cmd.Parameters.AddWithValue("@Email", entity.Email);
+                cmd.Parameters.AddWithValue("@Password", entity.Password);
+                cmd.Parameters.AddWithValue("@IsPremium", entity.IsPremium);
+                cmd.Parameters.AddWithValue("@RegistrationDate", entity._RegistrationDate);
+                cmd.Parameters.AddWithValue("@IsAdmin", false);
+
+                try
+                {
+                    result = cmd.ExecuteNonQuery() > 0 ? Result.Ok() : result;
+                }
+                catch (Exception ex)
+                {
+
+                }
+            }
+
+            return result;
         }
 
         public Result Delete(int id)
@@ -158,7 +186,55 @@ namespace MyTrainingPal.Infrastructure.Repositories
 
         public Result Update(User entity)
         {
-            throw new NotImplementedException();
+            Result result = Result.Fail("User update has failed.");
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                con.Open();
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = con;
+                cmd.CommandText = "UPDATE Users SET Name = @Name, LastName = @LastName, Email = @Email WHERE Id = @Id";
+                cmd.Parameters.AddWithValue("@Id", entity.Id);
+                cmd.Parameters.AddWithValue("@Name", entity.Name);
+                cmd.Parameters.AddWithValue("@LastName", entity.LastName);
+                cmd.Parameters.AddWithValue("@Email", entity.Email);
+
+                try
+                {
+                    result = cmd.ExecuteNonQuery() > 0 ? Result.Ok() : result;
+                }
+                catch (Exception ex)
+                {
+
+                }
+            }
+
+            return result;
+        }
+
+        public Result AddWorkoutToHistory(int workoutId, int userId)
+        {
+            Result result = Result.Fail("Workout could not be saved for this user.");
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                con.Open();
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = con;
+                cmd.CommandText = "INSERT INTO UserWorkoutHistory (WorkoutId, UserId, CompletionDate) VALUES(@WorkoutId, @UserId, @CompletionDate)";
+                cmd.Parameters.AddWithValue("@WorkoutId", workoutId);
+                cmd.Parameters.AddWithValue("@UserId", userId);
+                cmd.Parameters.AddWithValue("@CompletionDate", DateTime.Now);
+
+                try
+                {
+                    result = cmd.ExecuteNonQuery() > 0 ? Result.Ok() : result;
+                }
+                catch (Exception ex)
+                {
+
+                }
+            }
+
+            return result;
         }
 
         public Result<User> FindUserByCredentials(string email, string password)

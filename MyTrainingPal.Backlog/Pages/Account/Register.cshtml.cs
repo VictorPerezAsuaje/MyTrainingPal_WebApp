@@ -67,7 +67,13 @@ namespace MyTrainingPal.Backlog.Pages.Account
 
             try
             {
+                Result newUserResult = _userRepository.Add(newUser.Value);
 
+                if (newUserResult.IsFailure)
+                {
+                    TempData["RegistrationError"] = newUserResult.Error;
+                    return Page();
+                }
             }
             catch (Exception ex)
             {
@@ -75,6 +81,7 @@ namespace MyTrainingPal.Backlog.Pages.Account
                 return Page();
             }
 
+            TempData["Success"] = $"User {newUser.Value.FullName} registered successfully.";
             return RedirectToPage("/Account/Login");
         }
     }

@@ -1,0 +1,60 @@
+﻿@using MyTrainingPal.Domain.Entities
+@using MyTrainingPal.Domain.Enums
+@using MyTrainingPal.Service.DTO.Workouts
+@model WorkoutGetDTO
+
+@{
+    int currentSet = 1;
+    int numberOfSets = Model.Sets.Count -1;
+    string idSetActual = "";
+    string idSetSiguiente = "";
+    bool isAuthenticated = User?.Identity?.IsAuthenticated ?? false;
+}
+
+@for(int i = 0; i < Model.Sets.Count; i++)
+{
+    idSetActual = $"{Model.Sets[i].Id}_{currentSet}";
+
+    @if (i+1 == Model.Sets.Count)
+    {
+        if(currentSet != Model.Sets.Count)
+            idSetSiguiente = $"{Model.Sets[i-numberOfSets].Id}_{currentSet+1}";
+        else
+            idSetSiguiente = "exerciseFinishedCongrats";
+    }
+    else
+    {
+        idSetSiguiente = $"{Model.Sets[i+1].Id}_{currentSet}";
+    }
+
+    <div id="@idSetActual" class="exercise-row d-flex w-100 mb-2 border rounded text-black @(i != 0 || currentSet != 1? "d-none" : "")">
+    <img class="exercise-thumb rounded" src="https://cdn.pixabay.com/photo/2017/04/22/10/15/woman-2250970_960_720.jpg" />
+    <div class="w-100 d-flex justify-content-center align-items-center h2" onclick="MarkCompleted(this, '@idSetActual', '@idSetSiguiente')">
+        @if(Model.Sets[i].SetType == SetType.ByRepetition)
+        {
+            <span>@Model.Sets[i].Repetitions x @Model.Sets[i].Exercise.Name</span>
+        }
+        else
+        {
+            <span><span class="exercise-time">@($"{new TimeOnly(Model.Sets[i].Minutes, Model.Sets[i].Seconds)}")</span> @Model.Sets[i].Exercise.Name</span>
+        }
+    </div>
+</div>
+
+    @if(i+1 == Model.Sets.Count && currentSet != Model.NumberOfSets)
+    {
+        currentSet += 1;
+        i = -1;
+    }
+}
+
+<div id="exerciseFinishedCongrats" class="d-none">
+    <h3>Congratulations! You finished 😁</h3>
+
+    @if (isAuthenticated)
+    {
+        <form method="post" asp-action="SaveWorkoutAttempt" asp-route-workoutId="@Model.Id">
+            <button type="submit" class="btn btn-success" >SAVE ATTEMPT</button>
+        </form>
+    }
+</div>

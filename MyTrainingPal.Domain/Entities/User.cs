@@ -5,14 +5,14 @@ namespace MyTrainingPal.Domain.Entities
 {
     public class User : BaseEntity
     {
-        private string Name;
-        private string LastName;
+        public string Name { get; private set; }
+        public string LastName { get; private set; }
         public string FullName => $"{Name} {LastName}";
         public string Email { get; private set; }
-        private string Password { get; set; }
+        public string Password { get; private set; }
         public bool IsPremium { get; private set; } = false;
         public bool IsAdmin { get; private set; } = false;
-        private DateTime _RegistrationDate;
+        public DateTime _RegistrationDate { get; private set; }
         public string RegistrationDate { get => _RegistrationDate.ToShortDateString(); }
 
         public List<Workout> CreatedWorkouts { get; private set; } = new List<Workout>();
@@ -129,6 +129,20 @@ namespace MyTrainingPal.Domain.Entities
         public User WithCompletedWorkouts(List<WorkoutHistory> workouts)
         {
             CompletedWorkouts = workouts;
+            return this;
+        }
+
+        public User UpdateEditableFields(string? firstName = null, string? lastName = null, string? email = null)
+        {
+            if(!string.IsNullOrEmpty(firstName))
+                Name = firstName.Trim();
+
+            if(!string.IsNullOrEmpty(lastName))
+                LastName = lastName.Trim();
+
+            if(!string.IsNullOrEmpty(email))
+                Email = email.Trim();
+
             return this;
         }
     }

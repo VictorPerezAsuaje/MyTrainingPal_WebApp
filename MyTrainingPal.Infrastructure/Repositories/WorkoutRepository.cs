@@ -135,7 +135,8 @@ namespace MyTrainingPal.Infrastructure.Repositories
                             (
                                 id: (int)reader["WorkoutId"],
                                 name: (string)reader["WorkoutName"],
-                                workoutType: (WorkoutType)reader["WorkoutType"]
+                                workoutType: (WorkoutType)reader["WorkoutType"],
+                                numberOfSets: (int)reader["NumberOfSets"]
                             );
 
                             if (workoutResult.IsFailure)
@@ -183,7 +184,7 @@ namespace MyTrainingPal.Infrastructure.Repositories
                     con.Open();
                     SqlCommand cmd = new SqlCommand();
                     cmd.Connection = con;
-                    cmd.CommandText = "SELECT Workout.Id AS WorkoutId, Workout.Name AS WorkoutName, WorkoutType, Sets.Id AS SetId, SetType, Repetitions, Time, Exercises.Id AS ExerciseId, Exercises.Name AS ExerciseName, Level, ForceType, RequiresEquipment FROM Workout JOIN Sets ON Sets.WorkoutId = Workout.Id JOIN Exercises ON Sets.ExerciseId = Exercises.Id";
+                    cmd.CommandText = "SELECT Workout.Id AS WorkoutId, Workout.Name AS WorkoutName, WorkoutType, Sets.Id AS SetId, SetType, Repetitions, Time, Exercises.Id AS ExerciseId, Exercises.Name AS ExerciseName, Level, ForceType, RequiresEquipment, NumberOfSets FROM Workout JOIN Sets ON Sets.WorkoutId = Workout.Id JOIN Exercises ON Sets.ExerciseId = Exercises.Id";
 
                     SqlDataReader reader = cmd.ExecuteReader();
                     Result<Workout> workoutResult = null;
@@ -197,7 +198,8 @@ namespace MyTrainingPal.Infrastructure.Repositories
                             (
                                 id: (int)reader["WorkoutId"],
                                 name: (string)reader["WorkoutName"],
-                                workoutType: (WorkoutType)reader["WorkoutType"]
+                                workoutType: (WorkoutType)reader["WorkoutType"],
+                                numberOfSets: (int)reader["NumberOfSets"]
                             );
 
                             if (workoutResult.IsFailure)
@@ -235,7 +237,6 @@ namespace MyTrainingPal.Infrastructure.Repositories
             return Result.Ok(workouts);
         }
 
-
         public Result<Workout> GetById(int id)
         {
             Workout workout = null;
@@ -247,7 +248,7 @@ namespace MyTrainingPal.Infrastructure.Repositories
                     con.Open();
                     SqlCommand cmd = new SqlCommand();
                     cmd.Connection = con;
-                    cmd.CommandText = "SELECT Workout.Id AS WorkoutId, Workout.Name AS WorkoutName, WorkoutType, Sets.Id AS SetId, SetType, Repetitions, Time, Exercises.Id AS ExerciseId, Exercises.Name AS ExerciseName, Level, ForceType, RequiresEquipment FROM Workout JOIN Sets ON Sets.WorkoutId = Workout.Id JOIN Exercises ON Sets.ExerciseId = Exercises.Id WHERE WorkoutId = @WorkoutId";
+                    cmd.CommandText = "SELECT Workout.Id AS WorkoutId, Workout.Name AS WorkoutName, WorkoutType, Sets.Id AS SetId, SetType, Repetitions, Time, Exercises.Id AS ExerciseId, Exercises.Name AS ExerciseName, Level, ForceType, RequiresEquipment, NumberOfSets FROM Workout JOIN Sets ON Sets.WorkoutId = Workout.Id JOIN Exercises ON Sets.ExerciseId = Exercises.Id WHERE WorkoutId = @WorkoutId";
                     cmd.Parameters.AddWithValue("@WorkoutId", id);
 
                     SqlDataReader reader = cmd.ExecuteReader();
@@ -265,7 +266,8 @@ namespace MyTrainingPal.Infrastructure.Repositories
                                 (
                                     id: (int)reader["WorkoutId"],
                                     name: (string)reader["WorkoutName"],
-                                    workoutType: (WorkoutType)reader["WorkoutType"]
+                                    workoutType: (WorkoutType)reader["WorkoutType"],
+                                    numberOfSets: (int)reader["NumberOfSets"]
                                 );
 
                                 if (workoutResult.IsFailure)
