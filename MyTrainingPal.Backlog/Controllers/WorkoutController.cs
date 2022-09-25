@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MyTrainingPal.Backlog.Models;
 using MyTrainingPal.Domain.Common;
 using MyTrainingPal.Domain.Entities;
@@ -114,6 +115,25 @@ namespace MyTrainingPal.Backlog.Controllers
 
             TempData["Success"] = "Congratulations! Your attempt has been saved in your account 😁";
             return RedirectToAction("Index");
+        }
+
+
+        [Authorize]
+        public IActionResult CreateWorkout()
+        {
+            return View();
+        }
+
+        [Authorize]
+        public IActionResult EditWorkout()
+        {
+            return View();
+        }
+
+        [Authorize]
+        public IActionResult DeleteWorkout()
+        {
+            return View();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

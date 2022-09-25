@@ -116,7 +116,7 @@ namespace MyTrainingPal.Infrastructure.Repositories
 
                     SqlCommand cmdHistory = new SqlCommand();
                     cmdHistory.Connection = con;
-                    cmdHistory.CommandText = "SELECT Workout.UserId AS UserId, Workout.Id AS WorkoutId, Workout.Name AS WorkoutName, WorkoutType, CompletionDate, NumberOfSets FROM UserWorkoutHistory JOIN Workout ON Workout.Id = UserWorkoutHistory.WorkoutId WHERE Workout.UserId = @UserId";
+                    cmdHistory.CommandText = "SELECT UserWorkoutHistory.UserId AS UserId, Workout.Id AS WorkoutId, Workout.Name AS WorkoutName, WorkoutType, CompletionDate, NumberOfSets FROM UserWorkoutHistory JOIN Workout ON Workout.Id = UserWorkoutHistory.WorkoutId WHERE UserWorkoutHistory.UserId = @UserId";
                     cmdHistory.Parameters.AddWithValue("@UserId", id);
 
                     SqlDataReader historyReader = cmdHistory.ExecuteReader();
