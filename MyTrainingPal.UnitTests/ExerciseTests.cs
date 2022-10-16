@@ -14,8 +14,8 @@ namespace MyTrainingPal.UnitTests
         bool _hasEquipment = false;
         List<MuscleGroup> _listWithMuscleGroups = new List<MuscleGroup>()
         {
-            new MuscleGroup() { Id = 1, Name = "Chest"},
-            new MuscleGroup() { Id = 2, Name = "Back" }
+            new MuscleGroup(1, "Chest"),
+            new MuscleGroup(2, "Back")
         };
 
         [Fact]
@@ -45,7 +45,7 @@ namespace MyTrainingPal.UnitTests
         public void GenerateExercise_ListMuscleGroupsWithNulls_Fails()
         {
             MuscleGroup muscleGroupNull = null;
-            MuscleGroup muscleGroup = new MuscleGroup() { Name = "Push-ups" };
+            MuscleGroup muscleGroup = new MuscleGroup(1, "Push-ups" );
 
             List<MuscleGroup> muscles = new List<MuscleGroup>();
             muscles.Add(muscleGroup);

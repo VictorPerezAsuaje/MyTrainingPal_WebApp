@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using MyTrainingPal.Service.DTO.Workout;
 using MyTrainingPal.Service.Services;
 using MyTrainingPal.Domain.Common;
 using MyTrainingPal.Domain.Entities;
 using MyTrainingPal.Infrastructure.Repositories;
+using MyTrainingPal.Service.DTO.Workouts;
 
 namespace MyTrainingPal.API.Controllers
 {

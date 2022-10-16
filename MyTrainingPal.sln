@@ -27,6 +27,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{A5F152BA-F78
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyTrainingPal.Service", "MyTrainingPal.Service\MyTrainingPal.Service.csproj", "{DE52BE0D-91F2-4E60-9285-D419BFD1C94E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0D9082DF-9324-4F3C-9433-B6D067C148E3}"
+	ProjectSection(SolutionItems) = preProject
+		Database\scripts_para_generar_db.sql = Database\scripts_para_generar_db.sql
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
