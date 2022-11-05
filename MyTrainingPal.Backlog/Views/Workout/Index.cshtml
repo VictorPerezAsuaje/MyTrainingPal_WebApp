@@ -1,18 +1,32 @@
-﻿@using MyTrainingPal.Domain.Enums
+﻿@using MyTrainingPal.Backlog.Controllers
+@using MyTrainingPal.Domain.Enums
 @using MyTrainingPal.Infrastructure.DTO.Workout
 @using MyTrainingPal.Service.DTO.Workouts
+@using System.Text.Json
 
-@model List<WorkoutGetDTO>
+@model IndexViewModel
 
 @{
     ViewData["Title"] = "Welcome!";
     WorkoutFilterDTO filter = (WorkoutFilterDTO)ViewData["WorkoutFilter"];
 }
 
-<button id="openFiltersBtn" class="openbtn bg-dark" onclick="openNav()"><i class="bi bi-search"></i>
+<button id="openFiltersBtn" class="openbtn bg-dark" onclick="openNav()" style="z-index:8">
+    <i class="bi bi-search"></i>
 </button> 
 
-<div id="mySidebar" class="sidebar bg-dark">
+@if(Model.CurrentUser?.IsPremium ?? false){
+    <div class="modal fade" id="workoutCreateEditModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <partial name="_CreateOrEditWorkoutPartial" model="@Model.WorkoutPutDTO" />
+    </div>
+    <div class="d-flex justify-content-end mt-4 me-5">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#workoutCreateEditModal">Create workout</button>
+    </div>
+    
+}
+
+
+<div id="mySidebar" class="sidebar bg-dark" style="z-index:9">
     <form asp-controller="Workout" asp-action="FilterWorkouts" method="get" data-ajax="true"  data-ajax-method="get" data-ajax-update="#workoutList" data-ajax-mode="replace">
         <div class="filters">
             <div>
@@ -70,12 +84,18 @@
                 }
             </div>
         </div>
-        <button class="btn btn-primary" type="submit">FILTER</button>
+        <button class="btn btn-primary" type="submit" id="filterWorkoutsButton">FILTER</button>
     </form>
 </div>
 
+    
+
 <section class="wrapper">
     <div class="workout-container" id="workoutList">
-        <partial name="_WorkoutListPartial" for="@Model" />
+        <partial name="_WorkoutListPartial" for="@Model.Workouts" />
     </div>
 </section>
+
+@section Scripts{
+    <script src="~/js/pages/workouts.js"></script>
+}

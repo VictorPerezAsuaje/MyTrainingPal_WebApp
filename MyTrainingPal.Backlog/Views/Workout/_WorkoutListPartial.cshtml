@@ -1,5 +1,9 @@
 ﻿@using MyTrainingPal.Service.DTO.Workouts
+@using System.Security.Claims
 @model List<WorkoutGetDTO>
+@{
+    string? userId = Convert.ToString(User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value);
+}
 
 @if(Model == null)
 {
@@ -13,7 +17,26 @@ else
 {
     @foreach(WorkoutGetDTO workout in Model)
     {
-        <div class="card text-white card-has-bg click-col">
+        <div class="card text-white card-has-bg click-col position-relative">
+
+        @if(userId != null)
+        {
+            @if(Convert.ToInt32(userId) == workout.UserId){
+                    <div class="position-absolute top-0 start-0" style="z-index:1">
+                        <form asp-controller="Workout" asp-action="EditWorkout" asp-route-workoutId="@workout.Id" method="get" data-ajax="true" data-ajax-method="get" data-ajax-update="#workoutCreateEditModal" data-ajax-mode="replace" data-ajax-success="$('#workoutCreateEditModal').modal('show')">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-pencil-fill"></i>
+                        </button>
+                        </form>
+                    </div>
+                    <div class="position-absolute top-0 end-0" style="z-index:1">
+                        <a asp-controller="Workout" asp-action="Delete" asp-route-workoutId="@workout.Id" class="btn btn-danger">
+                            <i class="bi bi-trash-fill"></i>
+                        </a>
+                    </div>
+            }
+        }
+            
             <!-- Workout thumbnail -->
             <img class="card-img workout-background" src="https://cdn.pixabay.com/photo/2017/04/22/10/15/woman-2250970_960_720.jpg" alt="">
             <div class="card-img-overlay d-flex flex-column">

@@ -1,0 +1,64 @@
+﻿@using MyTrainingPal.Service.DTO.Exercise
+@using MyTrainingPal.Service.DTO.Workouts
+@using MyTrainingPal.Domain.Enums
+@model WorkoutPutDTO
+
+
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">@(Model.Id == null ? "Create" : "Edit") Workout</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="workoutCreateEditForm" asp-controller="Workout" asp-action="CreateOrEdit" asp-antiforgery="true">
+            <div class="modal-body" id="userEditContent">
+                <input id="workoutId" hidden value="@Model.Id" />
+                <div class="form-outline mb-4">
+                    <label class="form-label" asp-for="@Model.Name">Workout Name</label>
+                    <input id="workoutName" type="text" asp-for="@Model.Name" class="form-control form-control-lg" placeholder="Workout name." required />
+                    <span class="text-danger" asp-validation-for="@Model.Name"></span>
+                </div>
+
+                <div class="form-outline mb-4">
+                    <label class="form-label" asp-for="@Model.WorkoutType">Workout Type</label>
+                    <select id="workoutType" asp-for="@Model.SelectedWorkoutType" class="form-select">
+                        @foreach (WorkoutType type in Enum.GetValues(typeof(WorkoutType)))
+                        {
+                            <option value="@type">@Enum.GetName(type)</option>
+                        }
+                    </select>
+                    <span class="text-danger" asp-validation-for="@Model.WorkoutType"></span>
+                </div>
+
+                <div class="form-outline mb-4">
+                    <label class="form-label" asp-for="@Model.NumberOfSets">Number of sets</label>
+                    <input type="number" min="1" max="20" asp-for="@Model.NumberOfSets" class="form-control form-control-lg" placeholder="Number of sets" id="NumberOfSetsInput" onchange="ChangeAvailableSets(@Model.AvailableExercisesJSON)" value="" required />
+                    <span class="text-danger" asp-validation-for="@Model.NumberOfSets"></span>
+                </div>        
+                    
+                <div class="form-outline mb-4">
+                    <label class="form-label">Set types</label>
+                    <select class="form-select" asp-for="@Model.SelectedSetType" id="WorkoutSetType" onchange="ChangeAvailableSets(@Model.AvailableExercisesJSON)">
+                        @foreach (SetType type in Enum.GetValues(typeof(SetType)))
+                        {
+                            <option value="@type">@Enum.GetName(type)</option>
+                        }
+                    </select>
+                    <span class="text-danger" asp-validation-for="@Model.SetType"></span>
+                </div>
+
+                <h5>Exercises configuration</h5>
+
+                <div id="ExerciseContainer">
+                        
+                </div>
+                    
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary" for="workoutCreateEditForm" onclick="return SubmitNewWorkoutHandler(event)">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+

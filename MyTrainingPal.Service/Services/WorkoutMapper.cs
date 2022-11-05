@@ -8,7 +8,9 @@ using MyTrainingPal.Infrastructure.Repositories;
 namespace MyTrainingPal.Service.Services
 {
     public interface IWorkoutMapper : IMapper<Workout, WorkoutGetDTO, WorkoutPostDTO, WorkoutPutDTO>
-    {    }
+    {
+        WorkoutPutDTO EntityToPutDTO(Workout entity);
+    }
 
     public class WorkoutMapper : IWorkoutMapper
     {
@@ -29,7 +31,8 @@ namespace MyTrainingPal.Service.Services
                 Name = entity.Name,
                 NumberOfSets = entity.NumberOfSets,
                 Sets = entity.Sets,
-                WorkoutType = entity.WorkoutType
+                WorkoutType = entity.WorkoutType,
+                UserId = entity.UserId
             };
 
         public Result<Workout> PostDTOToEntity(WorkoutPostDTO postDTO)
@@ -38,7 +41,8 @@ namespace MyTrainingPal.Service.Services
             (
                 name: postDTO.Name,
                 workoutType: postDTO.WorkoutType,
-                numberOfSets: postDTO.NumberOfSets
+                numberOfSets: postDTO.NumberOfSets,
+                userId: postDTO.UserId
             );
 
             if (resultMap.IsFailure)
@@ -104,7 +108,8 @@ namespace MyTrainingPal.Service.Services
                 id: currentEntity.Id,
                 workoutType: workoutType,
                 name: name,
-                numberOfSets: numberSets
+                numberOfSets: numberSets,
+                userId: currentEntity.UserId
             );
 
             if(workoutResult.IsFailure)
@@ -152,5 +157,25 @@ namespace MyTrainingPal.Service.Services
 
             return Result.Ok(updatedWorkout);
         }
+
+        public WorkoutPutDTO EntityToPutDTO(Workout entity)
+         => new WorkoutPutDTO
+            {
+                Id = entity.Id,
+                Name = entity.Name,
+                NumberOfSets = entity.NumberOfSets,
+                SetPostDTOs = entity.Sets.Select(x => new SetPostDTO()
+                {
+                    SetType = x.SetType,
+                    SelectedSetType = Enum.GetName(x.SetType),
+                    ExerciseId = x.Exercise.Id,
+                    Hours = x.Hours,
+                    Minutes = x.Minutes,
+                    Seconds = x.Seconds,
+                    Repetitions = x.Repetitions
+                }).ToList(),
+                WorkoutType = entity.WorkoutType,
+            };
+        
     }
 }

@@ -71,7 +71,11 @@
                             else
                             {
                                 <p>You are not... 😢</p>
-                                <small>Want to be part of our family?</small>
+                                <form asp-controller="Profile" asp-action="MakeMePremium" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-success">Make me Premium! 🤑</button>
+                                </form>
+                                
                             }
                         </div>
                     </div>

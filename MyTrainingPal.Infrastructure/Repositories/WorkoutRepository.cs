@@ -92,7 +92,7 @@ namespace MyTrainingPal.Infrastructure.Repositories
                 cmd.Parameters.AddWithValue("@WorkoutType", filter.WorkoutType);
             }
 
-            if (filter.Level != null)
+            if (filter.Equipment != null)
             {
                 sqlFilter += " AND RequiresEquipment = @Equipment";
                 cmd.Parameters.AddWithValue("@Equipment", filter.Equipment);
@@ -118,7 +118,7 @@ namespace MyTrainingPal.Infrastructure.Repositories
                     con.Open();
                     SqlCommand cmd = new SqlCommand();
                     cmd.Connection = con;
-                    cmd.CommandText = "SELECT Workout.Id AS WorkoutId, Workout.Name AS WorkoutName, WorkoutType, Sets.Id AS SetId, SetType, Repetitions, Time, Exercises.Id AS ExerciseId, Exercises.Name AS ExerciseName, Level, ForceType, RequiresEquipment FROM Workout JOIN Sets ON Sets.WorkoutId = Workout.Id JOIN Exercises ON Sets.ExerciseId = Exercises.Id WHERE 1=1 ";
+                    cmd.CommandText = "SELECT Workout.Id AS WorkoutId, Workout.Name AS WorkoutName, WorkoutType, Sets.Id AS SetId, SetType, Repetitions, Time, Exercises.Id AS ExerciseId, Exercises.Name AS ExerciseName, Level, ForceType, RequiresEquipment, NumberOfSets, UserId FROM Workout JOIN Sets ON Sets.WorkoutId = Workout.Id JOIN Exercises ON Sets.ExerciseId = Exercises.Id WHERE 1=1 ";
 
                     if(filter != null)
                         cmd.CommandText += GenerateFilter(cmd, filter);
@@ -136,7 +136,8 @@ namespace MyTrainingPal.Infrastructure.Repositories
                                 id: (int)reader["WorkoutId"],
                                 name: (string)reader["WorkoutName"],
                                 workoutType: (WorkoutType)reader["WorkoutType"],
-                                numberOfSets: (int)reader["NumberOfSets"]
+                                numberOfSets: (int)reader["NumberOfSets"],
+                                userId: (int)reader["UserId"]
                             );
 
                             if (workoutResult.IsFailure)
@@ -184,7 +185,7 @@ namespace MyTrainingPal.Infrastructure.Repositories
                     con.Open();
                     SqlCommand cmd = new SqlCommand();
                     cmd.Connection = con;
-                    cmd.CommandText = "SELECT Workout.Id AS WorkoutId, Workout.Name AS WorkoutName, WorkoutType, Sets.Id AS SetId, SetType, Repetitions, Time, Exercises.Id AS ExerciseId, Exercises.Name AS ExerciseName, Level, ForceType, RequiresEquipment, NumberOfSets FROM Workout JOIN Sets ON Sets.WorkoutId = Workout.Id JOIN Exercises ON Sets.ExerciseId = Exercises.Id";
+                    cmd.CommandText = "SELECT Workout.Id AS WorkoutId, Workout.Name AS WorkoutName, WorkoutType, Sets.Id AS SetId, SetType, Repetitions, Time, Exercises.Id AS ExerciseId, Exercises.Name AS ExerciseName, Level, ForceType, RequiresEquipment, NumberOfSets, UserId FROM Workout JOIN Sets ON Sets.WorkoutId = Workout.Id JOIN Exercises ON Sets.ExerciseId = Exercises.Id";
 
                     SqlDataReader reader = cmd.ExecuteReader();
                     Result<Workout> workoutResult = null;
@@ -199,7 +200,8 @@ namespace MyTrainingPal.Infrastructure.Repositories
                                 id: (int)reader["WorkoutId"],
                                 name: (string)reader["WorkoutName"],
                                 workoutType: (WorkoutType)reader["WorkoutType"],
-                                numberOfSets: (int)reader["NumberOfSets"]
+                                numberOfSets: (int)reader["NumberOfSets"],
+                                userId: (int)reader["UserId"]
                             );
 
                             if (workoutResult.IsFailure)
@@ -248,7 +250,7 @@ namespace MyTrainingPal.Infrastructure.Repositories
                     con.Open();
                     SqlCommand cmd = new SqlCommand();
                     cmd.Connection = con;
-                    cmd.CommandText = "SELECT Workout.Id AS WorkoutId, Workout.Name AS WorkoutName, WorkoutType, Sets.Id AS SetId, SetType, Repetitions, Time, Exercises.Id AS ExerciseId, Exercises.Name AS ExerciseName, Level, ForceType, RequiresEquipment, NumberOfSets FROM Workout JOIN Sets ON Sets.WorkoutId = Workout.Id JOIN Exercises ON Sets.ExerciseId = Exercises.Id WHERE WorkoutId = @WorkoutId";
+                    cmd.CommandText = "SELECT Workout.Id AS WorkoutId, Workout.Name AS WorkoutName, WorkoutType, Sets.Id AS SetId, SetType, Repetitions, Time, Exercises.Id AS ExerciseId, Exercises.Name AS ExerciseName, Level, ForceType, RequiresEquipment, NumberOfSets, UserId FROM Workout JOIN Sets ON Sets.WorkoutId = Workout.Id JOIN Exercises ON Sets.ExerciseId = Exercises.Id WHERE WorkoutId = @WorkoutId";
                     cmd.Parameters.AddWithValue("@WorkoutId", id);
 
                     SqlDataReader reader = cmd.ExecuteReader();
@@ -267,7 +269,8 @@ namespace MyTrainingPal.Infrastructure.Repositories
                                     id: (int)reader["WorkoutId"],
                                     name: (string)reader["WorkoutName"],
                                     workoutType: (WorkoutType)reader["WorkoutType"],
-                                    numberOfSets: (int)reader["NumberOfSets"]
+                                    numberOfSets: (int)reader["NumberOfSets"],
+                                    userId: (int)reader["UserId"]
                                 );
 
                                 if (workoutResult.IsFailure)
@@ -299,6 +302,7 @@ namespace MyTrainingPal.Infrastructure.Repositories
             bool isOkey = false;
             SqlTransaction transaction = null;
             try
+            
             {
                 using (SqlConnection con = new SqlConnection(connectionString))
                 {
@@ -307,10 +311,12 @@ namespace MyTrainingPal.Infrastructure.Repositories
                     SqlCommand cmdWorkout = new SqlCommand();
                     cmdWorkout.Connection = con;
                     cmdWorkout.Transaction = transaction;
-                    cmdWorkout.CommandText = "INSERT INTO Workout (Name, WorkoutType) OUTPUT INSERTED.Id VALUES (@Name, @WorkoutType)";
+                    cmdWorkout.CommandText = "INSERT INTO Workout (Name, NumberOfSets, WorkoutType, UserId) OUTPUT INSERTED.Id VALUES (@Name, @NumberOfSets, @WorkoutType, @UserId)";
 
                     cmdWorkout.Parameters.AddWithValue("@Name", entity.Name);
-                    cmdWorkout.Parameters.AddWithValue("@WorkoutType", entity.WorkoutType);
+                    cmdWorkout.Parameters.AddWithValue("@NumberOfSets", entity.NumberOfSets);
+                    cmdWorkout.Parameters.AddWithValue("@WorkoutType", Convert.ToInt32(entity.WorkoutType));
+                    cmdWorkout.Parameters.AddWithValue("@UserId", entity.UserId);
 
                     int insertedWorkoutId = Convert.ToInt32(cmdWorkout.ExecuteScalar());
 
@@ -348,7 +354,14 @@ namespace MyTrainingPal.Infrastructure.Repositories
             catch (Exception ex)
             {
                 isOkey = false;
-                transaction.Rollback();
+                try
+                {
+                    transaction.Rollback();
+                }
+                catch (Exception ex2)
+                {
+
+                }
             }
 
             return isOkey ? Result.Ok() : Result.Fail("The workout could not be added.");
@@ -385,7 +398,7 @@ namespace MyTrainingPal.Infrastructure.Repositories
                 cmdWorkout.Transaction = transaction;
                 cmdWorkout.Parameters.AddWithValue("@WorkoutId", entity.Id);
                 cmdWorkout.Parameters.AddWithValue("@Name", entity.Name);
-                cmdWorkout.Parameters.AddWithValue("@WorkoutType", entity.WorkoutType);
+                cmdWorkout.Parameters.AddWithValue("@WorkoutType", Convert.ToInt32(entity.WorkoutType));
 
                 try
                 {
