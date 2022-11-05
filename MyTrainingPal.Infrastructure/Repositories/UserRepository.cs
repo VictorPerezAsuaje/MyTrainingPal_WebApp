@@ -103,7 +103,8 @@ namespace MyTrainingPal.Infrastructure.Repositories
                             id: (int)readerWorkouts["WorkoutId"],
                             name: (string)readerWorkouts["WorkoutName"],
                             workoutType: (WorkoutType)readerWorkouts["WorkoutType"],
-                            numberOfSets: (int)readerWorkouts["NumberOfSets"]
+                            numberOfSets: (int)readerWorkouts["NumberOfSets"],
+                            userId: id
                         );
 
                         if (workoutResult.IsFailure)
@@ -129,7 +130,8 @@ namespace MyTrainingPal.Infrastructure.Repositories
                             id: (int)historyReader["WorkoutId"],
                             name: (string)historyReader["WorkoutName"],
                             workoutType: (WorkoutType)historyReader["WorkoutType"],
-                            numberOfSets: (int)historyReader["NumberOfSets"]
+                            numberOfSets: (int)historyReader["NumberOfSets"],
+                            userId: id
                         );
 
                         if (workoutResult.IsFailure)
@@ -192,11 +194,12 @@ namespace MyTrainingPal.Infrastructure.Repositories
                 con.Open();
                 SqlCommand cmd = new SqlCommand();
                 cmd.Connection = con;
-                cmd.CommandText = "UPDATE Users SET Name = @Name, LastName = @LastName, Email = @Email WHERE Id = @Id";
+                cmd.CommandText = "UPDATE Users SET Name = @Name, LastName = @LastName, Email = @Email, IsPremium = @IsPremium WHERE Id = @Id";
                 cmd.Parameters.AddWithValue("@Id", entity.Id);
                 cmd.Parameters.AddWithValue("@Name", entity.Name);
                 cmd.Parameters.AddWithValue("@LastName", entity.LastName);
                 cmd.Parameters.AddWithValue("@Email", entity.Email);
+                cmd.Parameters.AddWithValue("@IsPremium", entity.IsPremium);
 
                 try
                 {

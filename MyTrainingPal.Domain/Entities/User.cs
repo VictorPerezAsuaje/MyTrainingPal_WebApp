@@ -145,5 +145,11 @@ namespace MyTrainingPal.Domain.Entities
 
             return this;
         }
+
+        public User MakeMePremium()
+        {
+            IsPremium = true;
+            return this;
+        }
     }
 }
