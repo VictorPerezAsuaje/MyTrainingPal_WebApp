@@ -46,9 +46,14 @@ public class ProfileController : Controller
             return View();
         }
 
-        UserGetDTO resultMap = _userMapper.EntityToGetDTO(resultUser.Value);
+        UserGetDTO userDTO = _userMapper.EntityToGetDTO(resultUser.Value);
 
-        return View(resultMap);
+        userDTO.ThisWeeksChart = _userRepository.GetUserWeeksWorkout(
+            Convert.ToInt32(userId), 
+            userDTO.FirstCurrentWeekDay, 
+            userDTO.LastCurrentWeekDay).Value;
+
+        return View(userDTO);
     }
 
     [Route("{page:int}")]

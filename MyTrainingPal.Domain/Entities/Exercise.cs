@@ -3,6 +3,7 @@ using MyTrainingPal.Domain.Enums;
 
 namespace MyTrainingPal.Domain.Entities
 {
+
     public class Exercise : BaseEntity
     {
         public string Name { get; private set; } 

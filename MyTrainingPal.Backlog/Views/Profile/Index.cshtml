@@ -97,8 +97,8 @@
             </div>
         </div>
     </div>
-    <div class="row gutters-sm flex-row-reverse ">
-        <div class="col-sm-4 mb-3">
+    <div class="row gutters-sm">
+        <div class="col-sm-12 col-lg-6 mb-3">
             <div class="card p-3 mb-3 shadow-none">
                     <div class="card-body">
                         <h6 class="d-flex align-items-center mb-3">Stats</h6>
@@ -114,13 +114,15 @@
             </div>
             <div class="card p-3 mb-3 shadow-none">
                 <div class="card-body">
-                    <h6 class="d-flex align-items-center mb-3">Who knows...</h6>
-                    <!-- Work In Progress -->
+                    <h6 class="d-flex align-items-center mb-3">This week</h6>
+                    <div id="chartContainer" style="height: 370px; width: 100%;">
+
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-sm-8 mb-3">
+        <div class="col-sm-12 col-lg-6 mb-3">
             <div class="card p-3 shadow-none">
                 <div class="card-body">
                     <h6 class="d-flex align-items-center mb-3">Latest Workouts</h6>
@@ -132,3 +134,11 @@
         </div>
     </div>
 </section>
+
+@section Scripts{
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    <script src="~/js/pages/profile.js"></script>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", LoadThisWeekWorkouts(@Json.Serialize(Model.ThisWeeksChart.ToList())));
+    </script>
+}

@@ -11,6 +11,7 @@ namespace MyTrainingPal.Infrastructure.Repositories
         Result<User> FindUserByCredentials(string email, string password);
         Result<User?> FindUserByEmail(string email);
         Result AddWorkoutToHistory(int workoutId, int userId);
+        Result<Dictionary<string, List<ChartDataPoint>>> GetUserWeeksWorkout(int id, DateTime firstDay, DateTime lastDay);
     }
     public class UserRepository : IUserRepository
     {
@@ -335,6 +336,65 @@ namespace MyTrainingPal.Infrastructure.Repositories
             }
 
             return Result.Ok(user);
+        }
+
+        public Result<Dictionary<string, List<ChartDataPoint>>> GetUserWeeksWorkout(int id, DateTime firstDay, DateTime lastDay)
+        {
+            Dictionary<string, List<ChartDataPoint>> chartPoints = new Dictionary<string, List<ChartDataPoint>>();
+
+            try
+            {
+                using (SqlConnection con = new SqlConnection(connectionString))
+                {
+                    con.Open();
+                    SqlCommand cmd = new SqlCommand();
+                    cmd.Connection = con;
+                    cmd.CommandText = @"SELECT WorkoutType, 
+                        CONCAT(YEAR(CompletionDate), '-', MONTH(CompletionDate), '-', DAY(CompletionDate)) AS XPoint, 
+                        Count(CompletionDate) AS YPoint
+                        FROM UserWorkoutHistory AS uwk
+                        JOIN Workout AS w ON w.Id = uwk.WorkoutId
+                        WHERE CompletionDate > @FirstDayWeek AND CompletionDate <= @LastDayWeek
+                        AND uwk.UserId = @UserId
+                        GROUP BY WorkoutType, CONCAT(YEAR(CompletionDate), '-', MONTH(CompletionDate), '-', DAY(CompletionDate));";
+                    cmd.Parameters.AddWithValue("@UserId", id);
+                    cmd.Parameters.AddWithValue("@FirstDayWeek", firstDay);
+                    cmd.Parameters.AddWithValue("@LastDayWeek", lastDay);
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        string name = ((WorkoutType)reader["WorkoutType"]).ToString();
+
+                        if (chartPoints.ContainsKey(name))
+                        {
+                            chartPoints[name].Add(new ChartDataPoint()
+                            {
+                                XPoint = DateTime.Parse((string)reader["XPoint"]),
+                                YPoint = (int)reader["YPoint"]
+                            });
+
+                            continue;
+                        }
+
+                        chartPoints.Add(name, new List<ChartDataPoint>()
+                        {
+                            new ChartDataPoint()
+                            {
+                                XPoint = DateTime.Parse((string)reader["XPoint"]),
+                                YPoint = (int)reader["YPoint"]
+                            }
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return Result.Fail<Dictionary<string, List<ChartDataPoint>>>("The data could not be retrieved.");
+            }
+
+            return Result.Ok(chartPoints);
         }
     }
 }
