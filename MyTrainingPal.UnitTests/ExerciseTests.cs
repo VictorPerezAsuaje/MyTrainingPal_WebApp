@@ -12,6 +12,7 @@ namespace MyTrainingPal.UnitTests
         DifficultyLevel _difficulty = DifficultyLevel.Beginner;
         ForceType _force = ForceType.Push;
         bool _hasEquipment = false;
+        string _videoUrl = "https://musclewiki.com/media/uploads/male-bodyweight-crunch-side.gif";
         List<MuscleGroup> _listWithMuscleGroups = new List<MuscleGroup>()
         {
             new MuscleGroup(1, "Chest"),
@@ -21,14 +22,14 @@ namespace MyTrainingPal.UnitTests
         [Fact]
         public void GenerateExercise_EveryParameterAdded_IsSuccess()
         {         
-            Result result = Exercise.Generate(_name, _listWithMuscleGroups, _difficulty, _force, _hasEquipment);
+            Result result = Exercise.Generate(_name, _listWithMuscleGroups, _difficulty, _force, _hasEquipment, _videoUrl);
             Assert.True(result.IsSuccess);
         }
 
         [Fact]
         public void GenerateExercise_NameEmpty_Fails()
         {
-            Result result = Exercise.Generate("", _listWithMuscleGroups, _difficulty, _force, _hasEquipment);
+            Result result = Exercise.Generate("", _listWithMuscleGroups, _difficulty, _force, _hasEquipment, _videoUrl);
 
             Assert.True(result.IsFailure);
         }
@@ -36,7 +37,7 @@ namespace MyTrainingPal.UnitTests
         [Fact]
         public void GenerateExercise_NameNull_Fails()
         {
-            Result result = Exercise.Generate(null, _listWithMuscleGroups, _difficulty, _force, _hasEquipment);
+            Result result = Exercise.Generate(null, _listWithMuscleGroups, _difficulty, _force, _hasEquipment, _videoUrl);
 
             Assert.True(result.IsFailure);
         }
@@ -51,7 +52,7 @@ namespace MyTrainingPal.UnitTests
             muscles.Add(muscleGroup);
             muscles.Add(muscleGroupNull);
 
-            Result result = Exercise.Generate(_name, muscles, _difficulty, _force, _hasEquipment);
+            Result result = Exercise.Generate(_name, muscles, _difficulty, _force, _hasEquipment, _videoUrl);
 
             Assert.True(result.IsFailure);
         }

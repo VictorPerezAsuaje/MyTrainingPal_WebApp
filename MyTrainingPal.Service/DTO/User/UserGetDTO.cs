@@ -22,7 +22,7 @@ public class UserGetDTO
     public string RegistrationDate { get; set; }
 
     public DateTime FirstCurrentWeekDay => DateTime.Now.StartOfWeek(DayOfWeek.Monday);
-    public DateTime LastCurrentWeekDay => DateTime.Now.StartOfWeek(DayOfWeek.Monday).AddDays(6);
+    public DateTime LastCurrentWeekDay => DateTime.Now.StartOfWeek(DayOfWeek.Monday).AddDays(7);
 
     public Dictionary<string, List<ChartDataPoint>> ThisWeeksChart { get; set; }
 

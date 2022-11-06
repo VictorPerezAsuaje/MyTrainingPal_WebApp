@@ -11,5 +11,6 @@ namespace MyTrainingPal.Service.DTO.Exercise
         public DifficultyLevel Level { get; set; }
         public ForceType ForceType { get; set; }
         public bool Equipment { get; set; }
+        public string VideoUrl { get; set; }
     }
 }

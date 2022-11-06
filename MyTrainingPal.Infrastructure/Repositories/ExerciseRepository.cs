@@ -23,7 +23,7 @@ namespace MyTrainingPal.Infrastructure.Repositories
                 con.Open();
                 SqlCommand cmd = new SqlCommand();
                 cmd.Connection = con;
-                cmd.CommandText = "SELECT ExerciseId, Exercises.Name AS ExerciseName, Level, ForceType, RequiresEquipment, MuscleGroupId, MuscleGroups.Name AS MuscleGroupName FROM Exercises JOIN ExercisesMuscleGroups ON ExercisesMuscleGroups.ExerciseId = Exercises.Id JOIN MuscleGroups ON ExercisesMuscleGroups.MuscleGroupId = MuscleGroups.Id ORDER BY ExerciseId ";
+                cmd.CommandText = "SELECT ExerciseId, Exercises.Name AS ExerciseName, Level, ForceType, RequiresEquipment, VideoUrl, MuscleGroupId, MuscleGroups.Name AS MuscleGroupName FROM Exercises JOIN ExercisesMuscleGroups ON ExercisesMuscleGroups.ExerciseId = Exercises.Id JOIN MuscleGroups ON ExercisesMuscleGroups.MuscleGroupId = MuscleGroups.Id ORDER BY ExerciseId ";
 
                 SqlDataReader reader = cmd.ExecuteReader();
 
@@ -36,8 +36,9 @@ namespace MyTrainingPal.Infrastructure.Repositories
                         DifficultyLevel level = (DifficultyLevel)reader["Level"];
                         ForceType forceType = (ForceType)reader["ForceType"];
                         bool requiresEquipment = (bool)reader["RequiresEquipment"];
+                        string videoUrl = (string)reader["VideoUrl"];
 
-                        Exercise exercise = Exercise.Generate(name, new List<MuscleGroup>(), level, forceType, requiresEquipment, id).Value;
+                        Exercise exercise = Exercise.Generate(name, new List<MuscleGroup>(), level, forceType, requiresEquipment, videoUrl, id).Value;
 
                         MuscleGroup muscleGroup = new MuscleGroup(
                             id: (int)reader["MuscleGroupId"],
@@ -76,7 +77,7 @@ namespace MyTrainingPal.Infrastructure.Repositories
                 con.Open();
                 SqlCommand cmd = new SqlCommand();
                 cmd.Connection = con;
-                cmd.CommandText = "SELECT Id, Name, Level, ForceType, RequiresEquipment FROM Exercises WHERE Id = @ExerciseId";
+                cmd.CommandText = "SELECT Id, Name, Level, ForceType, RequiresEquipment, VideoUrl FROM Exercises WHERE Id = @ExerciseId";
                 cmd.Parameters.AddWithValue("@ExerciseId", id);
 
                 SqlDataReader reader = cmd.ExecuteReader();
@@ -93,6 +94,7 @@ namespace MyTrainingPal.Infrastructure.Repositories
                             level: (DifficultyLevel)reader["Level"],
                             forceType: (ForceType)reader["ForceType"],
                             hasEquipment: (bool)reader["RequiresEquipment"],
+                            videoUrl: (string)reader["VideoUrl"],
                             muscleGroups: new List<MuscleGroup>());
 
                             if (exerciseResult.IsFailure)

@@ -31,7 +31,8 @@ namespace MyTrainingPal.Service.Services
                 forceType: postDTO.ForceType,
                 hasEquipment: postDTO.Equipment,
                 level: postDTO.Level,
-                muscleGroups: postDTO._muscleGroups
+                muscleGroups: postDTO._muscleGroups,
+                videoUrl: postDTO.VideoUrl
             );
 
         public Result<Exercise> PutDTOToEntity(Exercise currentEntity, ExercisePutDTO putDTO)

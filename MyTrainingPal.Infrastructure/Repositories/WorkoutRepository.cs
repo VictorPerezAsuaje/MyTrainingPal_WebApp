@@ -26,7 +26,8 @@ namespace MyTrainingPal.Infrastructure.Repositories
                 muscleGroups: new List<MuscleGroup>(),
                 level: (DifficultyLevel)reader["Level"],
                 forceType: (ForceType)reader["ForceType"],
-                hasEquipment: (bool)reader["RequiresEquipment"]);
+                hasEquipment: (bool)reader["RequiresEquipment"],
+                videoUrl: (string)reader["VideoUrl"]);
 
             if (exerciseResult.IsFailure)
                 return Result.Fail<Set>(exerciseResult.Error);
@@ -118,7 +119,7 @@ namespace MyTrainingPal.Infrastructure.Repositories
                     con.Open();
                     SqlCommand cmd = new SqlCommand();
                     cmd.Connection = con;
-                    cmd.CommandText = "SELECT Workout.Id AS WorkoutId, Workout.Name AS WorkoutName, WorkoutType, Sets.Id AS SetId, SetType, Repetitions, Time, Exercises.Id AS ExerciseId, Exercises.Name AS ExerciseName, Level, ForceType, RequiresEquipment, NumberOfSets, UserId FROM Workout JOIN Sets ON Sets.WorkoutId = Workout.Id JOIN Exercises ON Sets.ExerciseId = Exercises.Id WHERE 1=1 ";
+                    cmd.CommandText = "SELECT Workout.Id AS WorkoutId, Workout.Name AS WorkoutName, WorkoutType, Sets.Id AS SetId, SetType, Repetitions, Time, Exercises.Id AS ExerciseId, Exercises.Name AS ExerciseName, Level, ForceType, RequiresEquipment, NumberOfSets, UserId, VideoUrl FROM Workout JOIN Sets ON Sets.WorkoutId = Workout.Id JOIN Exercises ON Sets.ExerciseId = Exercises.Id WHERE 1=1 ";
 
                     if(filter != null)
                         cmd.CommandText += GenerateFilter(cmd, filter);
@@ -185,7 +186,7 @@ namespace MyTrainingPal.Infrastructure.Repositories
                     con.Open();
                     SqlCommand cmd = new SqlCommand();
                     cmd.Connection = con;
-                    cmd.CommandText = "SELECT Workout.Id AS WorkoutId, Workout.Name AS WorkoutName, WorkoutType, Sets.Id AS SetId, SetType, Repetitions, Time, Exercises.Id AS ExerciseId, Exercises.Name AS ExerciseName, Level, ForceType, RequiresEquipment, NumberOfSets, UserId FROM Workout JOIN Sets ON Sets.WorkoutId = Workout.Id JOIN Exercises ON Sets.ExerciseId = Exercises.Id";
+                    cmd.CommandText = "SELECT Workout.Id AS WorkoutId, Workout.Name AS WorkoutName, WorkoutType, Sets.Id AS SetId, SetType, Repetitions, Time, Exercises.Id AS ExerciseId, Exercises.Name AS ExerciseName, Level, ForceType, RequiresEquipment, NumberOfSets, VideoUrl, UserId FROM Workout JOIN Sets ON Sets.WorkoutId = Workout.Id JOIN Exercises ON Sets.ExerciseId = Exercises.Id";
 
                     SqlDataReader reader = cmd.ExecuteReader();
                     Result<Workout> workoutResult = null;
@@ -194,7 +195,7 @@ namespace MyTrainingPal.Infrastructure.Repositories
                         while (reader.Read())
                         {
                             // Workout generation
-                            
+
                             workoutResult = Workout.Generate
                             (
                                 id: (int)reader["WorkoutId"],
@@ -250,7 +251,7 @@ namespace MyTrainingPal.Infrastructure.Repositories
                     con.Open();
                     SqlCommand cmd = new SqlCommand();
                     cmd.Connection = con;
-                    cmd.CommandText = "SELECT Workout.Id AS WorkoutId, Workout.Name AS WorkoutName, WorkoutType, Sets.Id AS SetId, SetType, Repetitions, Time, Exercises.Id AS ExerciseId, Exercises.Name AS ExerciseName, Level, ForceType, RequiresEquipment, NumberOfSets, UserId FROM Workout JOIN Sets ON Sets.WorkoutId = Workout.Id JOIN Exercises ON Sets.ExerciseId = Exercises.Id WHERE WorkoutId = @WorkoutId";
+                    cmd.CommandText = "SELECT Workout.Id AS WorkoutId, Workout.Name AS WorkoutName, WorkoutType, Sets.Id AS SetId, SetType, Repetitions, Time, Exercises.Id AS ExerciseId, Exercises.Name AS ExerciseName, Level, ForceType, RequiresEquipment, NumberOfSets, UserId, VideoUrl FROM Workout JOIN Sets ON Sets.WorkoutId = Workout.Id JOIN Exercises ON Sets.ExerciseId = Exercises.Id WHERE WorkoutId = @WorkoutId";
                     cmd.Parameters.AddWithValue("@WorkoutId", id);
 
                     SqlDataReader reader = cmd.ExecuteReader();

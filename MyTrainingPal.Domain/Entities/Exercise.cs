@@ -11,10 +11,11 @@ namespace MyTrainingPal.Domain.Entities
         public DifficultyLevel Level { get; private set; }
         public ForceType ForceType { get; private set; }
         public bool Equipment { get; private set; }
+        public string VideoUrl { get; private set; }
 
         Exercise() { }
 
-        public static Result<Exercise> Generate(string name, List<MuscleGroup> muscleGroups, DifficultyLevel level, ForceType forceType, bool hasEquipment, int? id = null)
+        public static Result<Exercise> Generate(string name, List<MuscleGroup> muscleGroups, DifficultyLevel level, ForceType forceType, bool hasEquipment, string videoUrl, int? id = null)
         {
             Exercise exercise = new Exercise();
 
@@ -24,6 +25,9 @@ namespace MyTrainingPal.Domain.Entities
             if (name == "" || name == null)
                 return Result.Fail<Exercise>("Name can not be empty.");
 
+            if (string.IsNullOrEmpty(videoUrl))
+                return Result.Fail<Exercise>("Video url can not be empty.");
+
             if (id != null) 
                 exercise.Id = (int)id;
 
@@ -32,6 +36,7 @@ namespace MyTrainingPal.Domain.Entities
             exercise.Level = level;
             exercise.ForceType = forceType;
             exercise.Equipment = hasEquipment;
+            exercise.VideoUrl = videoUrl;   
 
             return Result.Ok(exercise);
         }

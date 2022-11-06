@@ -27,11 +27,11 @@ const ExerciseSet = (exercises, setNumber, setType) => `
 </div><hr />
 `
 
-const ChangeAvailableSets = (exercises) => {
+const ChangeAvailableExercises = (exercises) => {
     const selectSetType = document.getElementById("WorkoutSetType");
     const selectedType = selectSetType.options[selectSetType.selectedIndex].innerText;
 
-    const inputNumberSets = document.getElementById("NumberOfSetsInput");
+    const inputNumberSets = document.getElementById("NumberOfExercisesInput");
     const numberOfSets = inputNumberSets.value;
 
     const exerciseContainer = document.getElementById("ExerciseContainer");
@@ -49,18 +49,36 @@ const ValidateForm = (formId) => {
     let form = document.getElementById(formId);
 
     let isValid = true;
-    for (var i = 0; i < form.elements.length; i++) {
+    for (let i = 0; i < form.elements.length; i++) {
         if (form.elements[i].value === '' && form.elements[i].hasAttribute('required')) {
             let itemName = form.elements[i].name
             let valRequiredMessage = form.elements[i].getAttribute("data-val-required");
             let span = document.querySelectorAll(`[data-valmsg-for='${itemName}']`)[0];
-            span.innerText = valRequiredMessage;
+
+            if (span !== undefined && span !== null)
+                span.innerText = valRequiredMessage;
+
             isValid = false;
         }
     }
 
     return isValid;
 }
+
+const ClearForm = (formId) => {
+    let form = document.getElementById(formId);
+    for (let i = 0; i < form.elements.length; i++) {
+        switch (form.elements[i].localName) {
+            case "input":
+                form.elements[i].value = '';
+                break;
+            case "select":
+                form.elements[i].selectedIndex = 0;
+                break;
+        }            
+    }
+}
+
 
 const SubmitNewWorkoutHandler = (e) => {
     e.preventDefault();
@@ -108,7 +126,13 @@ const SubmitNewWorkoutHandler = (e) => {
             Swal.fire({
                 icon: 'success',
                 title: 'Done!',
+                confirmButtonText: 'Close',
+                allowOutsideClick: false,
                 text: result.responseText,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById("filterWorkoutsButton").click();
+                } 
             })
         },
         error: function (result) {
@@ -120,7 +144,7 @@ const SubmitNewWorkoutHandler = (e) => {
         }
     });
 
-    document.getElementById("filterWorkoutsButton").click();
+    ClearForm('workoutCreateEditForm');
 }
 
 class WorkoutPutDTO {

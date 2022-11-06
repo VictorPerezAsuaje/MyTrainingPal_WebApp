@@ -6,7 +6,7 @@
 <a class="my-5 openbtn rounded text-decoration-none bg-dark" asp-action="Index">←</a>
 
 <div class="exercise-viewer mb-2 mt-2">
-    <img src="https://cdn.pixabay.com/photo/2017/04/22/10/15/woman-2250970_960_720.jpg" class="exercise-fullsize rounded"/>
+    <img src="@Model.Sets[0].Exercise.VideoUrl" class="exercise-fullsize rounded" id="mainVideo"/>
 </div>
 
 <div id="workout-exercises">
