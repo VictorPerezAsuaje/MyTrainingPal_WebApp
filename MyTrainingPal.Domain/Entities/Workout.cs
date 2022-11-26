@@ -22,8 +22,18 @@ namespace MyTrainingPal.Domain.Entities
         {
             Workout workout = new Workout();
 
+            if (string.IsNullOrEmpty(name))
+                return Result.Fail<Workout>("Name is necessary");
+
+            if (numberOfSets < 1)
+                return Result.Fail<Workout>("The number of sets can not be less than 1");
+
+            if (userId < 1)
+                return Result.Fail<Workout>("User not found");
+
+
             // Generation
-            if(id != null)
+            if (id != null)
                 workout.Id = (int)id;
 
             if (user != null)

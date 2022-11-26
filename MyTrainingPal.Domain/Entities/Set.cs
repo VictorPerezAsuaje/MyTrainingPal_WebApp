@@ -25,10 +25,10 @@ namespace MyTrainingPal.Domain.Entities
             if (exercise == null)
                 return Result.Fail<Set>("There was not exercise provided.");
 
-            if (setType == SetType.ByTime && seconds < 1 && minutes <= 0 && hours <= 0)
+            if (setType == SetType.ByTime && ((seconds < 1 && minutes <= 0 && hours <= 0) || seconds == null && minutes == null && hours == null))
                 return Result.Fail<Set>("The selected set requires that the exercise last at least 1 second.");
 
-            if (setType == SetType.ByRepetition && repetitions <= 0)
+            if (setType == SetType.ByRepetition && (repetitions <= 0 || repetitions == null))
                 return Result.Fail<Set>("The selected set requires that the exercise to have at least 1 repetition.");
 
 
