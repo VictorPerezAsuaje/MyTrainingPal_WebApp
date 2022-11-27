@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using MyTrainingPal.Backlog.Models;
 using MyTrainingPal.Domain.Common;
 using MyTrainingPal.Domain.Entities;
@@ -7,6 +8,7 @@ using MyTrainingPal.Infrastructure.Repositories;
 using MyTrainingPal.Service.DTO.User;
 using MyTrainingPal.Service.DTO.Workouts;
 using MyTrainingPal.Service.Services;
+using System.Linq;
 using System.Security.Claims;
 
 namespace MyTrainingPal.Backlog.Controllers;
@@ -105,7 +107,13 @@ public class ProfileController : Controller
     public IActionResult AcceptEditUser([FromForm]UserEditForm userEditForm)
     {
         if (!ModelState.IsValid)
-            return View(userEditForm);
+        {
+            List<string> errores = ModelState.Values.Where(x => x.ValidationState == ModelValidationState.Invalid).SelectMany(x => x.Errors).Select(x => x.ErrorMessage).ToList();
+
+            TempData["Error"] = string.Join("\n- ", errores);
+            return RedirectToAction("Index");
+        }
+            
 
         string userId = Convert.ToString(User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value);
         Result<User> resultUser = _userRepository.GetById(Convert.ToInt32(userId));

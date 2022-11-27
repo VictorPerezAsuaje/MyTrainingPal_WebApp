@@ -23,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyTrainingPal.API", "MyTrai
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyTrainingPal.Backlog", "MyTrainingPal.Backlog\MyTrainingPal.Backlog.csproj", "{2878E6B4-D769-4518-BA16-71C14BA22C7F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{A5F152BA-F782-4BDA-BD91-F24A16C188DF}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Aplication", "Aplication", "{A5F152BA-F782-4BDA-BD91-F24A16C188DF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyTrainingPal.Service", "MyTrainingPal.Service\MyTrainingPal.Service.csproj", "{DE52BE0D-91F2-4E60-9285-D419BFD1C94E}"
 EndProject
